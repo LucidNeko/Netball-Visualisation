@@ -1,2 +1,2 @@
 # Netball-Visualisation
-Group project for User Interface Design
+Group project for SWEN303 User Interface Design.
