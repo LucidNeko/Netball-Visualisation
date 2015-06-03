@@ -78,6 +78,14 @@
 			entry.score = { home: scores[0], away: scores[1] }; 
 		}
 
+		if(!entry.byes) {
+			var dateString = entry.date.match(/\d+.*/);
+			entry.date = dateString[0]; //grab first element of match array
+			entry.date = entry.date.concat(", ").concat(entry.year);
+			entry.date = new Date(entry.date);
+		}
+		
+
 		// var dateString = entry.date.match(/\d+.*/)
 		// dateString = dateString + 
 		// //date
