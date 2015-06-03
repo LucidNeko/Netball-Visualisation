@@ -41,13 +41,11 @@
 		//make all properties camelcase
 		for(var key in entry) {
 			var camelKey = camelize(key.toLowerCase());
-			if(key !== camelKey) { 
+			if(key !== camelKey) { //if the key wasn't already camelcase
 				entry[camelKey] = entry[key];
 				delete entry[key];
 			}
 		}
-
-		
 
 		//add a year property
 		entry.year = getYearFromFilename(filename);
@@ -84,14 +82,6 @@
 			entry.date = entry.date.concat(", ").concat(entry.year);
 			entry.date = new Date(entry.date);
 		}
-		
-
-		// var dateString = entry.date.match(/\d+.*/)
-		// dateString = dateString + 
-		// //date
-		// if(!entry.byes) {
-		// 	entry.date = Date.parse(entry.date);
-		// }
 
 		return entry;
 	};
