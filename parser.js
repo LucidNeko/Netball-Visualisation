@@ -73,7 +73,7 @@
 		//extract score
 		if(!entry.byes) {
 			var scores = entry.score.match(/\d+/g);
-			entry.score = { home: scores[0], away: scores[1] }; 
+			entry.score = { home: +scores[0], away: +scores[1] }; 
 		}
 
 		if(!entry.byes) {
@@ -82,6 +82,10 @@
 			entry.date = entry.date.concat(", ").concat(entry.year);
 			entry.date = new Date(entry.date);
 		}
+
+		//make numbers
+		entry.round = +entry.round;
+		entry.year = +entry.year;
 
 		return entry;
 	};
