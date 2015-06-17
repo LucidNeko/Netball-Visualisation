@@ -1,3 +1,5 @@
+"use strict";
+
 (function (self) {
 
 	var dataFiles = [ "data/2008-Table1.csv", 
@@ -100,10 +102,14 @@
 				});
 			});
 		})).then(function (lists) {
-			return Array.prototype.concat.apply([], lists);
+			var allData = Array.prototype.concat.apply([], lists);
+			var noByes = allData.filter(function (entry) {
+				return entry.byes ? false : true; 
+			});
+
+			//filters out byes because they're useless.
+			return noByes;
 		});
 	};
 
-
-
-})(netball.parser = netball.parser || {});
+})(netball.parser = netball.parser || {})
