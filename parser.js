@@ -2,10 +2,10 @@
 
 (function (self) {
 
-	var dataFiles = [ "data/2008-Table1.csv", 
-					  "data/2009-Table1.csv", 
-					  "data/2010-Table1.csv", 
-					  "data/2011-Table1.csv", 
+	var dataFiles = [ "data/2008-Table1.csv",
+					  "data/2009-Table1.csv",
+					  "data/2010-Table1.csv",
+					  "data/2011-Table1.csv",
 					  "data/2012-Table1.csv",
 					  "data/2013-Table1.csv" ];
 
@@ -58,8 +58,7 @@
 		//If it's BYES
 		if(entry.byes) {
 
-			var byesReg = new RegExp("BYES:\\s*")
-
+			var byesReg = new RegExp("BYES:\\s*");
 			var teams = entry.date.replace(byesReg, "").split(" and ");
 			entry.homeTeam = teams[0];
 			entry.awayTeam = teams[1];
@@ -75,7 +74,7 @@
 		//extract score
 		if(!entry.byes) {
 			var scores = entry.score.match(/\d+/g);
-			entry.score = { home: +scores[0], away: +scores[1] }; 
+			entry.score = { home: +scores[0], away: +scores[1] };
 		}
 
 		if(!entry.byes) {
@@ -104,7 +103,7 @@
 		})).then(function (lists) {
 			var allData = Array.prototype.concat.apply([], lists);
 			var noByes = allData.filter(function (entry) {
-				return entry.byes ? false : true; 
+				return entry.byes ? false : true;
 			});
 
 			//filters out byes because they're useless.
