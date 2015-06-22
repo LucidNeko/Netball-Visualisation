@@ -18,3 +18,11 @@ body {
     /*stroke: steelblue;*/
     stroke-width: 1.5px;
 }
+
+.team-node-text {
+	font: sans-serif;
+}
+
+.team-node-circle {
+	stroke-width: 2px;
+}
