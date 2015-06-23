@@ -83,8 +83,7 @@
     self.rivals = function (data, svg, settings) {
 
         var force = d3.layout.force()
-            .charge(-10)
-            .linkDistance(300)
+            .charge(-300)
             .size([svg.attr("width") - margin.left - margin.right,
                 svg.attr("height") - margin.top - margin.bottom]);
 
@@ -100,7 +99,8 @@
                 var targetIndex = teamNames.indexOf(opponentName);
 
                 // if link is not already made, add to links
-                if (!containsLink(links, {source: sourceIndex, target: targetIndex })){
+                if ((sourceIndex !== targetIndex) &&
+                    !containsLink(links, {source: sourceIndex, target: targetIndex })){
                     links.push({
                         source: sourceIndex,
                         target: targetIndex, 
@@ -110,15 +110,29 @@
             }
         });
 
-
-        force.linkStrength(function (link){
+        force.linkDistance(function (link){
             // wl ratio of totally even is 0.5
             // so we get distance to 0.5 
-            var difference = Math.abs(link.wLRatio - 0.5);
-            var inverted = 0.5 - difference;
-            var exaggerated = Math.pow(inverted, 2);
-            return exaggerated;
+            var difference = Math.abs(link.wLRatio - 0.5) * 2;
+
+            // console.log("#" + link.source.index + "-circle");
+
+            var srcRad = +svg.select("#circle-" + link.source.index).attr("r");
+            var targetRad = +svg.select("#circle-" + link.target.index).attr("r");
+
+            var minDist = srcRad + targetRad;
+            var maxDist = 500;
+
+            var scale = d3.scale.linear().domain([0, 1]).range([minDist, maxDist]);
+            var scaled = scale(difference);
+            console.log(link.source.name + " <-> " + link.target.name
+                + "\nMin Dist: " + minDist
+                + "\nActual Dist: " + scaled
+                + "\nDiff: " + difference);
+            return scaled;
         });
+
+        force.linkStrength(1.0);
 
         force.nodes(teams);
         force.links(links);
@@ -126,8 +140,7 @@
         var node = svg.selectAll(".team")
             .data(teams)
           .enter().append("g")
-            .attr("class", "team");
-
+            .attr("class", "team")
 
         // max radius of a team circle
         var maxR = 100;
@@ -139,7 +152,11 @@
             })
             .attr("fill", function (d) {
                 return d3.rgb(Math.random()*255, Math.random()*255, Math.random()*255).toString();
+            })
+            .attr("id", function (d, i) {
+                return "circle-" + i;
             });
+
 
         node.call(force.drag);
 
@@ -154,9 +171,8 @@
           .enter().append("text")
             .attr("class", "link")
             .text( function (link) {
-                return link.wLRatio;
+                return parseFloat(link.wLRatio).toFixed(2);
             });
-
 
         // after the force layout's calculations are done?
         force.on("tick", function () {
@@ -179,11 +195,10 @@
 
             // svg.selectAll(".link")
             //     .attr("x", function (d){
-            //         console.log(d);
-            //         return Math.abs(teams[d.source].x - teams[d.target].x);
+            //         return Math.abs((d.source.x + d.target.x)/2);
             //     })
             //     .attr("y", function (d){
-            //         return Math.abs(teams[d.source].y - teams[d.target].y);
+            //         return Math.abs((d.source.y + d.target.y)/2);
             //     });
         });
 
