@@ -83,8 +83,8 @@
     self.rivals = function (data, svg, settings) {
 
         var force = d3.layout.force()
-            // .charge(-40)
-            .linkDistance(100)
+            .charge(-10)
+            .linkDistance(300)
             .size([svg.attr("width") - margin.left - margin.right,
                 svg.attr("height") - margin.top - margin.bottom]);
 
@@ -117,7 +117,6 @@
           .enter().append("g")
             .attr("class", "team");
 
-        node.call(force.drag);
 
         // max radius of a team circle
         var maxR = 100;
@@ -126,12 +125,16 @@
             .attr("class", "team-node-circle")
             .attr("r", function (team) {
                 return team.ratio * maxR;
+            })
+            .attr("fill", function (d) {
+                return d3.rgb(Math.random()*255, Math.random()*255, Math.random()*255).toString();
             });
-            // todo: call(force.drag) to allow for dragging of the nodes
+
+        node.call(force.drag);
 
         node.append("text")
             .attr("class", "team-node-text")
-            .text( function (team){
+            .text(function (team){
                 return team.name;
             });
 
@@ -148,7 +151,7 @@
 
             svg.selectAll(".team-node-text")
                 .attr("x", function (d){
-                    return d.x - svg.select(this).attr("r");
+                    return d.x;
                 })
                 .attr("y", function (d) {
                     return d.y;

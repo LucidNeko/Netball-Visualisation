@@ -57,7 +57,7 @@
         return cloned;
     }
 
-    // gets weight (success) value for all teams given games games
+    // returns array of teams, each with a name, wl, and wl against all other teams
     // currently just gets win/loss measure
     self.getTeams = function (games) {
 
