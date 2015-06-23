@@ -94,19 +94,30 @@
         // make links
         var links = [];
         teams.forEach( function (team, index){
-            for (var opposing in team.opponents){
+            for (var opponentName in team.opponents){
+                var opponent = team.opponents[opponentName];
                 var sourceIndex = index;
-                var targetIndex = teamNames.indexOf(opposing);
+                var targetIndex = teamNames.indexOf(opponentName);
 
                 // if link is not already made, add to links
                 if (!containsLink(links, {source: sourceIndex, target: targetIndex })){
                     links.push({
                         source: sourceIndex,
                         target: targetIndex, 
-                        wLRatio: opposing.ratio
+                        wLRatio: opponent.ratio
                     });
                 }
             }
+        });
+
+
+        force.linkStrength(function (link){
+            // wl ratio of totally even is 0.5
+            // so we get distance to 0.5 
+            var difference = Math.abs(link.wLRatio - 0.5);
+            var inverted = 0.5 - difference;
+            var exaggerated = Math.pow(inverted, 2);
+            return exaggerated;
         });
 
         force.nodes(teams);
@@ -138,6 +149,15 @@
                 return team.name;
             });
 
+        var link = svg.selectAll(".link")
+            .data(links)
+          .enter().append("text")
+            .attr("class", "link")
+            .text( function (link) {
+                return link.wLRatio;
+            });
+
+
         // after the force layout's calculations are done?
         force.on("tick", function () {
             // move teams to right place
@@ -156,19 +176,28 @@
                 .attr("y", function (d) {
                     return d.y;
                 });
+
+            // svg.selectAll(".link")
+            //     .attr("x", function (d){
+            //         console.log(d);
+            //         return Math.abs(teams[d.source].x - teams[d.target].x);
+            //     })
+            //     .attr("y", function (d){
+            //         return Math.abs(teams[d.source].y - teams[d.target].y);
+            //     });
         });
 
         force.start();
-
     }
 
     // returns true if links contains an equivilent link
     function containsLink(links, link){
-        links.forEach( function (elem) {
+        for (var i = 0; i < links.length; i++){
+            var elem = links[i];
             if ((elem.source === link.source && elem.target === link.target) ||
                 (elem.source === link.target && elem.target === link.source))
                 return true;
-        });
+        }
         return false;
     }
 

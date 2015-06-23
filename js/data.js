@@ -91,9 +91,10 @@
             var team = teams[teamName];
             team.ratio = team.wins / (team.wins + team.losses);
             // iterate through all opposing teams
-            for (var opponent in team.opponents){
+            Object.keys(team.opponents).forEach(function (opponentName) {
+                var opponent = team.opponents[opponentName];
                 opponent.ratio = opponent.wins / (opponent.wins + opponent.losses);
-            }
+            });
         });
 
         // returns as array of team stats, rather than mappings from name to stats
