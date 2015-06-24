@@ -3,10 +3,32 @@
 	<head>
 		<meta charset="UTF-8">
 		<title>Netball Visualisation Nation</title>
-	  	<script src="lib/d3.v3.min.js" charset="utf-8"></script>
         <link rel="stylesheet" href="style.css"/>
+	  	<script src="lib/d3.v3.min.js"></script>
+	  	<script src="lib/jquery."></script>
 	</head>
 	<body>
+
+        <header><a href="http://www.anz-championship.com"><img src="img/ANZ_Championship_logo_2010.jpg" width="100" height="100" /></a></header>
+        <menu type="list" label="visualisation menu" id="vis-menu">
+        <ul id="menu-list">
+        	<li class="vis-item"><menuitem type="command" label="Rivals" id="rivals-button">Rivals</menuitem></li>
+        	<li class="vis-item"><menuitem type="command" label="Scores" id="score-button">Scores</menuitem></li>
+    	</ul>
+        </menu>
+        <div id="vis-container">
+        	<menu type="list" id="seasons-menu">
+        		<menuitem type="radio" radiogroup="season" class="season-option">All</menuitem>
+        		<menuitem type="radio" radiogroup="season" class="season-option">2013</menuitem>
+        		<menuitem type="radio" radiogroup="season" class="season-option">2012</menuitem>
+        		<menuitem type="radio" radiogroup="season" class="season-option">2011</menuitem>
+        		<menuitem type="radio" radiogroup="season" class="season-option">2010</menuitem>
+        		<menuitem type="radio" radiogroup="season" class="season-option">2009</menuitem>
+        		<menuitem type="radio" radiogroup="season" class="season-option">2008</menuitem>
+        	</menu>
+	        <svg id="vis-svg" />
+        </div>
+
         <script src="js/util.js"></script>
         <script src="js/namespace.js"></script>
 		<script src="js/parser.js"></script>
