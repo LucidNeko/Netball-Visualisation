@@ -112,23 +112,25 @@
 
         force.linkDistance(function (link){
             // wl ratio of totally even is 0.5
-            // so we get distance to 0.5 
+            // so we get distance to 0.5 represented in range 0 - 1
             var difference = Math.abs(link.wLRatio - 0.5) * 2;
 
-            // console.log("#" + link.source.index + "-circle");
-
+            // radii of circles
             var srcRad = +svg.select("#circle-" + link.source.index).attr("r");
             var targetRad = +svg.select("#circle-" + link.target.index).attr("r");
 
             var minDist = srcRad + targetRad;
             var maxDist = 500;
 
+            // scale difference in wl ratio to distance apart
             var scale = d3.scale.linear().domain([0, 1]).range([minDist, maxDist]);
             var scaled = scale(difference);
-            console.log(link.source.name + " <-> " + link.target.name
-                + "\nMin Dist: " + minDist
-                + "\nActual Dist: " + scaled
-                + "\nDiff: " + difference);
+
+            // console.log(link.source.name + " <-> " + link.target.name
+            //     + "\nMin Dist: " + minDist
+            //     + "\nActual Dist: " + scaled
+            //     + "\nDiff: " + difference);
+
             return scaled;
         });
 

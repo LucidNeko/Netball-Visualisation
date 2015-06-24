@@ -1,5 +1,6 @@
 body {
     font: 10px sans-serif;
+    color: grey;
 }
 
 .axis path,
@@ -25,4 +26,56 @@ body {
 
 .team-node-circle {
 	stroke-width: 2px;
+}
+
+#vis-menu {
+    float: left;
+    width: 100px;
+    height: 100%;
+    margin: auto 10px;
+    padding: 0;
+    overflow: hidden;
+    font-size: 25px;
+    vertical-align: top;
+}
+
+#menu-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.vis-item {
+    width: auto;
+    padding: 20px 3px;
+    margin: 0;
+    cursor: pointer;
+}
+
+.vis-item:hover {
+    background: black;
+}
+
+#vis-svg {
+    float: left;
+    width: 100%;
+    height: 100%;
+}
+
+#vis-container {
+    display: inline-block;
+    width: 80%;
+    height: 80%;
+}
+
+#seasons-menu {
+    float: left;
+    padding-right: auto;
+    padding-left: 10%;
+    cursor: default;
+}
+
+.season-option {
+    padding: 0 10px;
+    cursor: pointer;
 }

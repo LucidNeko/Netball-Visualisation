@@ -102,7 +102,6 @@
             return teams[name];
         });
 
-        console.log("returning teams");
         return teamsArray;
     }
 
