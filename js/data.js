@@ -20,7 +20,7 @@
 
     self.teamGames = function (games) {
         // make blank team array for each team
-        var teams = teams.map(function (d){ return []; });
+        var teams = teamNames.map(function (d){ return []; });
 
         // sort each game into team array
         games.forEach(function (game) {

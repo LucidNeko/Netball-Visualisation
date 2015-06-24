@@ -10,7 +10,7 @@
 					.attr("height", height)
                     .attr("transform", "translate(0,0)");
 
-        // netball.visuals.scoreVis(data, svg);
+        //netball.visuals.scoreVis(data, svg);
         netball.visuals.rivals(data, svg);
         console.log("loaded vis");
 	}
