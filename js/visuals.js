@@ -65,6 +65,8 @@
         // data arranged into teams
         var teamGames = netball.data.teamGames(data);
 
+        var colour = d3.scale.category20();
+
         // make line for each team
         // TODO: do this without loop?
         teamGames.forEach(function (team) {
@@ -73,7 +75,7 @@
                 .datum(team)
                 .attr("class", "line")
                 .attr("d", line)
-                .attr("stroke", d3.rgb(Math.random()*255, Math.random()*255, Math.random()*255).toString());
+                .attr("stroke", colour(team));//d3.rgb(Math.random()*255, Math.random()*255, Math.random()*255).toString());
         });
 
         // add legend

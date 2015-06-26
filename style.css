@@ -58,6 +58,7 @@ body {
 
 #vis-svg {
     float: left;
+    /*display: inline-block;*/
     width: 100%;
     height: 100%;
 }
