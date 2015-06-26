@@ -65,6 +65,8 @@
         // data arranged into teams
         var teamGames = netball.data.teamGames(data);
 
+        var colour = d3.scale.category20();
+
         // make line for each team
         // TODO: do this without loop?
         teamGames.forEach(function (team) {
@@ -73,7 +75,7 @@
                 .datum(team)
                 .attr("class", "line")
                 .attr("d", line)
-                .attr("stroke", d3.rgb(Math.random()*255, Math.random()*255, Math.random()*255).toString());
+                .attr("stroke", colour(team));
         });
 
         // add legend
@@ -85,24 +87,65 @@
         // max radius of a team circle
         var maxR = 100;
 
+        // stores important objects and creates svg elements
+        // and sets non-changing settings
         self.setup = function (data, svg, settings) {
 
             self.svg = svg;
             self.force = d3.layout.force()
-                .charge(-300)
+                .charge(-50)
                 .size([svg.attr("width") - margin.left - margin.right,
                     svg.attr("height") - margin.top - margin.bottom]);
 
             self.teams = netball.data.getTeams(data);
-            var teamNames = netball.data.getTeamNames();
+            self.teamNames = netball.data.getTeamNames();
 
+            var node = svg.selectAll(".team")
+                .data(self.teams)
+              .enter().append("g")
+                .attr("class", "team noselect")
+                .attr("id", function (d, i){
+                    return "team-"+i;
+                })
+                .on("click", function(d){
+                    self.singleTeamView(d);
+                });
+
+            node.append("circle")
+                .attr("class", "team-node-circle")
+                .attr("r", function (team) {
+                    return team.ratio * maxR;
+                })
+                .attr("fill", function (d) {
+                    return d3.rgb(Math.random()*255, Math.random()*255, Math.random()*255).toString();
+                })
+                .attr("id", function (d, i) {
+                    return "circle-" + i;
+                });
+
+            node.append("text")
+                .attr("class", "team-node-text")
+                .text(function (team){
+                    return team.name;
+                });
+
+            node.call(self.force.drag);
+
+            // default view for this force layout
+            self.fullTeamView();
+            // starts the force physics
+            self.force.start();
+        }
+
+        // show rivalries between all teams at once
+        self.fullTeamView = function (){
             // make links
             var links = [];
             self.teams.forEach( function (team, index){
                 for (var opponentName in team.opponents){
                     var opponent = team.opponents[opponentName];
                     var sourceIndex = index;
-                    var targetIndex = teamNames.indexOf(opponentName);
+                    var targetIndex = self.teamNames.indexOf(opponentName);
 
                     // if link is not already made, add to links
                     if ((sourceIndex !== targetIndex) &&
@@ -121,10 +164,9 @@
                 // so we get distance to 0.5 represented in range 0 - 1
                 var difference = ratioToDifference(link.wLRatio);
 
-
                 // radii of circles
-                var srcRad = +svg.select("#circle-" + link.source.index).attr("r");
-                var targetRad = +svg.select("#circle-" + link.target.index).attr("r");
+                var srcRad = +self.svg.select("#circle-" + link.source.index).attr("r");
+                var targetRad = +self.svg.select("#circle-" + link.target.index).attr("r");
 
                 var minDist = srcRad + targetRad;
                 var maxDist = 500;
@@ -141,52 +183,22 @@
                 return scaled;
             });
 
+            // reset mouse listeners on nodes
+            self.svg.selectAll(".team")
+                .on("mouseover", null)
+                .on("mouseout", null);
+
             self.force.linkStrength(1.0);
 
+            // bind nodes and links to the force graph
             self.force.nodes(self.teams);
+            self.force.charge(-150);
             self.force.links(links);
+            self.force.gravity(0.1);
 
-            var node = svg.selectAll(".team")
-                .data(self.teams)
-              .enter().append("g")
-                .attr("class", "team")
-                .attr("id", function (d){
-                    return d.name;
-                });
-
-            node.append("circle")
-                .attr("class", "team-node-circle")
-                .attr("r", function (team) {
-                    return team.ratio * maxR;
-                })
-                .attr("fill", function (d) {
-                    return d3.rgb(Math.random()*255, Math.random()*255, Math.random()*255).toString();
-                })
-                .attr("id", function (d, i) {
-                    return "circle-" + i;
-                });
-
-
-            node.call(self.force.drag);
-
-            node.append("text")
-                .attr("class", "team-node-text")
-                .text(function (team){
-                    return team.name;
-                });
-
-            var link = svg.selectAll(".link")
-                .data(links)
-              .enter().append("text")
-                .attr("class", "link")
-                .text( function (link) {
-                    return parseFloat(link.wLRatio).toFixed(2);
-                });
-
-            // after the force layout's calculations are done?
             self.force.on("tick", function () {
                 // move teams to right place
-                svg.selectAll(".team-node-circle")
+                self.svg.selectAll(".team-node-circle")
                     .attr("cx", function (d) {
                         return d.x;
                     })
@@ -194,7 +206,7 @@
                         return d.y;
                     });
 
-                svg.selectAll(".team-node-text")
+                self.svg.selectAll(".team-node-text")
                     .attr("x", function (d){
                         return d.x;
                     })
@@ -202,18 +214,19 @@
                         return d.y;
                     });
             });
-            self.force.start();
-        }
 
+        }
 
         // changes vis to be centered on one team
         // team param is the name of a team
-        self.singleRival = function (team) {
+        self.singleTeamView = function (team) {
             // links change to only be to chosen team
-            var teamNames = netball.data.getTeamNames();
-            var teamIndex = teamNames.indexOf(team);
+            var teamIndex = self.teamNames.indexOf(team.name);
+            var selector = "#team"+teamIndex;
+
             var links = [];
-            self.teams.forEach( function (team, index){
+            self.teams.forEach( function (otherTeam, index){
+                if (otherTeam.name === team.name) return;
                 links.push({
                     source: index,
                     target: teamIndex
@@ -221,17 +234,83 @@
             });
 
             self.force.links(links);
-            self.force.linkDistance(100);
+            self.force.linkDistance(200);
+            self.force.charge(-500);
+            self.force.gravity(0.01);
 
             // change size of circles to be win loss
             // vs chosen team
-            svg.select(".team-node-circle")
+            self.svg.selectAll(".team-node-circle")
                 .transition()
-                .duration(1000)
+                .ease("bounce")
+                .duration(800)
                 .attr("r", function (d){
-                    var team = getTeam(d.name);
-                    return team.opponents[team].wLRatio * maxR;
+                    // don't change central team circle's radius
+                    if (d.name !== team.name){
+                        var thisTeam = getTeam(self.teams, d.name);
+                        var ratio = thisTeam.opponents[team.name].ratio;
+                        return ratio * maxR;
+                    } else {
+                        // (what it used to be)
+                        return d.ratio * maxR;
+                    }
                 });
+
+            self.svg.selectAll(".force-line").remove();
+
+            // add lines (invisible at first)
+            var line = self.svg.selectAll(".force-line")
+                .data(self.force.links())
+              .enter().append("line")
+                .attr("class", "force-line")
+                .attr("id", function (d, i){
+                    return "force-line-" + d.source;
+                })
+                .style("stroke", "black")
+                .style("stroke-width", function (d){
+                    return d.wLRatio;
+                })
+                .style("opacity", "0");
+
+            // add mouse listening
+            var node = self.svg.selectAll(".team:not("+selector+")")
+                .on("mouseover", function(d, i){
+                    var linkLine = self.svg.select("#force-line-"+d.index);
+                    linkLine.transition()
+                        .style("opacity", "1");
+                })
+                .on("mouseout", function (d, i){
+                    var linkLine = self.svg.select("#force-line-"+d.index);
+                    linkLine.transition()
+                        .style("opacity", "0");
+                });
+
+            self.force.on("tick", function (){
+                line.attr("x1", function(d) { return d.source.x; })
+                        .attr("y1", function(d) { return d.source.y; })
+                        .attr("x2", function(d) { return d.target.x; })
+                        .attr("y2", function(d) { return d.target.y; });
+
+                // copied from above
+                // move teams to right place
+                self.svg.selectAll(".team-node-circle")
+                    .attr("cx", function (d) {
+                        return d.x;
+                    })
+                    .attr("cy", function (d) {
+                        return d.y;
+                    });
+
+                self.svg.selectAll(".team-node-text")
+                    .attr("x", function (d){
+                        return d.x;
+                    })
+                    .attr("y", function (d) {
+                        return d.y;
+                    });
+            });
+
+            self.force.start();
         }
 
         return self;

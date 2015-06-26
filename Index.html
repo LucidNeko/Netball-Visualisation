@@ -12,12 +12,15 @@
         <header><a href="http://www.anz-championship.com"><img src="img/ANZ_Championship_logo_2010.jpg" width="100" height="100" /></a></header>
         <menu type="list" label="visualisation menu" id="vis-menu">
         <ul id="menu-list">
-        	<li class="vis-item"><menuitem type="command" label="Rivals" id="rivals-button">Rivals</menuitem></li>
-        	<li class="vis-item"><menuitem type="command" label="Scores" id="score-button">Scores</menuitem></li>
+        	<li class="vis-item"><menuitem type="command" label="Rivals" id="rivals-button" onclick="netball.gui.onRival()">Rivals</menuitem></li>
+        	<li class="vis-item"><menuitem type="command" label="Scores" id="score-button" onclick="netball.gui.onScore()">Scores</menuitem></li>
     	</ul>
         </menu>
         <div id="vis-container">
-        	<menu type="list" id="seasons-menu">
+            <form>
+                <input type="radio" name="year" value="all">All</input>
+            </form>
+        	<!-- <menu type="list" id="seasons-menu">
         		<menuitem type="radio" radiogroup="season" class="season-option">All</menuitem>
         		<menuitem type="radio" radiogroup="season" class="season-option">2013</menuitem>
         		<menuitem type="radio" radiogroup="season" class="season-option">2012</menuitem>
@@ -25,7 +28,7 @@
         		<menuitem type="radio" radiogroup="season" class="season-option">2010</menuitem>
         		<menuitem type="radio" radiogroup="season" class="season-option">2009</menuitem>
         		<menuitem type="radio" radiogroup="season" class="season-option">2008</menuitem>
-        	</menu>
+        	</menu> -->
 	        <svg id="vis-svg" />
         </div>
 
