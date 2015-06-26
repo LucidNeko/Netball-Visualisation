@@ -23,7 +23,7 @@
         var xAxis = d3.svg.axis()
             .scale(x)
             .orient("bottom")
-            .ticks(d3.time.month);
+            .ticks(settings.year === "all" ? d3.time.year : d3.time.month);
 
         var yAxis = d3.svg.axis()
             .scale(y)
