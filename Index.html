@@ -11,24 +11,40 @@
 
         <header><a href="http://www.anz-championship.com"><img src="img/ANZ_Championship_logo_2010.jpg" width="100" height="100" /></a></header>
         <menu type="list" label="visualisation menu" id="vis-menu">
-        <ul id="menu-list">
-        	<li class="vis-item"><menuitem type="command" label="Rivals" id="rivals-button" onclick="netball.gui.onRival()">Rivals</menuitem></li>
-        	<li class="vis-item"><menuitem type="command" label="Scores" id="score-button" onclick="netball.gui.onScore()">Scores</menuitem></li>
+        <ul id="menu-list" class="radio-toolbar">
+        	<li class="vis-item">
+                <input onchange="netball.gui.onVisChange(value)" id="rivals-button" type="radio" name="Visualisations" value="rivals" checked>
+                <label class="noselect vis-item" for="rivals-button">Rivals</label>
+            </li>
+        	<li class="vis-item">
+                <input onchange="netball.gui.onVisChange(value)" id="score-button" type="radio" name="Visualisations" value="scores">
+                <label class="noselect vis-item" for="score-button">Scores</label>
+            </li>
     	</ul>
         </menu>
-        <div id="vis-container">
-            <form>
-                <input type="radio" name="year" value="all">All</input>
-            </form>
-        	<!-- <menu type="list" id="seasons-menu">
-        		<menuitem type="radio" radiogroup="season" class="season-option">All</menuitem>
-        		<menuitem type="radio" radiogroup="season" class="season-option">2013</menuitem>
-        		<menuitem type="radio" radiogroup="season" class="season-option">2012</menuitem>
-        		<menuitem type="radio" radiogroup="season" class="season-option">2011</menuitem>
-        		<menuitem type="radio" radiogroup="season" class="season-option">2010</menuitem>
-        		<menuitem type="radio" radiogroup="season" class="season-option">2009</menuitem>
-        		<menuitem type="radio" radiogroup="season" class="season-option">2008</menuitem>
-        	</menu> -->
+        <div id="vis-container" class="radio-toolbar">
+
+            <input onchange="netball.gui.onYearChange(value)" id="year-all" type="radio" name="year" value="all" checked>
+            <label class="noselect season-option" for="year-all">All</label>
+
+            <input onchange="netball.gui.onYearChange(value)" id="year-2013" type="radio" name="year" value="2013">
+            <label class="noselect season-option" for="year-2013">2013</label>
+
+            <input onchange="netball.gui.onYearChange(value)" id="year-2012" type="radio" name="year" value="2012">
+            <label class="noselect season-option" for="year-2012">2012</label>
+
+            <input onchange="netball.gui.onYearChange(value)" id="year-2011" type="radio" name="year" value="2011">
+            <label class="noselect season-option" for="year-2011">2011</label>
+
+            <input onchange="netball.gui.onYearChange(value)" id="year-2010" type="radio" name="year" value="2010">
+            <label class="noselect season-option" for="year-2010">2010</label>
+
+            <input onchange="netball.gui.onYearChange(value)" id="year-2009" type="radio" name="year" value="2009">
+            <label class="noselect season-option" for="year-2009">2009</label>
+
+            <input onchange="netball.gui.onYearChange(value)" id="year-2008" type="radio" name="year" value="2008">
+            <label class="noselect season-option" for="year-2008">2008</label>
+
 	        <svg id="vis-svg" />
         </div>
 

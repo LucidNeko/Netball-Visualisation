@@ -56,8 +56,8 @@ body {
     cursor: pointer;
 }
 
-.vis-item:hover {
-    background: black;
+.vis-item:hover  {
+    /*background: black;*/
 }
 
 #vis-svg {
@@ -71,6 +71,8 @@ body {
     display: inline-block;
     width: 80%;
     height: 80%;
+    font-size: 16px;
+    cursor: default;
 }
 
 #seasons-menu {
@@ -83,4 +85,21 @@ body {
 .season-option {
     padding: 0 10px;
     cursor: pointer;
+}
+
+.noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.radio-toolbar input[type="radio"] {
+    display:none; 
+}
+
+.radio-toolbar input[type="radio"]:checked + label { 
+    background-color:#bbb;
 }
