@@ -11,7 +11,8 @@
                     .attr("transform", "translate(0,0)");
 
         // netball.visuals.scoreVis(data, svg);
-        netball.visuals.rivals(data, svg);
+        var rivals = netball.visuals.rivals;
+        rivals.setup(data, svg);
 	}
 
 	//calls onRead with the data once ready.
