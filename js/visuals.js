@@ -7,7 +7,7 @@
     // assume svg is blank
     self.scoreVis = function (data, svg, settings){
 
-            var width = svg.attr("width") - margin.left - margin.right,
+        var width = svg.attr("width") - margin.left - margin.right,
             height = svg.attr("height") - margin.top - margin.bottom;
 
         var g = svg.append("g")
@@ -23,7 +23,7 @@
         var xAxis = d3.svg.axis()
             .scale(x)
             .orient("bottom")
-            .ticks(d3.time.month);
+            .ticks(settings.year === "all" ? d3.time.year : d3.time.month);
 
         var yAxis = d3.svg.axis()
             .scale(y)
@@ -65,6 +65,8 @@
         // data arranged into teams
         var teamGames = netball.data.teamGames(data);
 
+        var colour = d3.scale.category20();
+
         // make line for each team
         // TODO: do this without loop?
         teamGames.forEach(function (team) {
@@ -73,140 +75,252 @@
                 .datum(team)
                 .attr("class", "line")
                 .attr("d", line)
-                .attr("stroke", d3.rgb(Math.random()*255, Math.random()*255, Math.random()*255).toString());
+                .attr("stroke", colour(team));
         });
 
         // add legend
         //
     }
 
-    self.rivals = function (data, svg, settings) {
-
-        var force = d3.layout.force()
-            .charge(-300)
-            .size([svg.attr("width") - margin.left - margin.right,
-                svg.attr("height") - margin.top - margin.bottom]);
-
-        var teams = netball.data.getTeams(data);
-        var teamNames = netball.data.getTeamNames();
-
-        // make links
-        var links = [];
-        teams.forEach( function (team, index){
-            for (var opponentName in team.opponents){
-                var opponent = team.opponents[opponentName];
-                var sourceIndex = index;
-                var targetIndex = teamNames.indexOf(opponentName);
-
-                // if link is not already made, add to links
-                if ((sourceIndex !== targetIndex) &&
-                    !containsLink(links, {source: sourceIndex, target: targetIndex })){
-                    links.push({
-                        source: sourceIndex,
-                        target: targetIndex, 
-                        wLRatio: opponent.ratio
-                    });
-                }
-            }
-        });
-
-        force.linkDistance(function (link){
-            // wl ratio of totally even is 0.5
-            // so we get distance to 0.5 represented in range 0 - 1
-            var difference = Math.abs(link.wLRatio - 0.5) * 2;
-
-            // radii of circles
-            var srcRad = +svg.select("#circle-" + link.source.index).attr("r");
-            var targetRad = +svg.select("#circle-" + link.target.index).attr("r");
-
-            var minDist = srcRad + targetRad;
-            var maxDist = 500;
-
-            // scale difference in wl ratio to distance apart
-            var scale = d3.scale.linear().domain([0, 1]).range([minDist, maxDist]);
-            var scaled = scale(difference);
-
-            // console.log(link.source.name + " <-> " + link.target.name
-            //     + "\nMin Dist: " + minDist
-            //     + "\nActual Dist: " + scaled
-            //     + "\nDiff: " + difference);
-
-            return scaled;
-        });
-
-        force.linkStrength(1.0);
-
-        force.nodes(teams);
-        force.links(links);
-
-        var node = svg.selectAll(".team")
-            .data(teams)
-          .enter().append("g")
-            .attr("class", "team")
+    self.rivals = (function (self) {
 
         // max radius of a team circle
         var maxR = 100;
 
-        node.append("circle")
-            .attr("class", "team-node-circle")
-            .attr("r", function (team) {
-                return team.ratio * maxR;
-            })
-            .attr("fill", function (d) {
-                return d3.rgb(Math.random()*255, Math.random()*255, Math.random()*255).toString();
-            })
-            .attr("id", function (d, i) {
-                return "circle-" + i;
-            });
+        // stores important objects and creates svg elements
+        // and sets non-changing settings
+        self.setup = function (data, svg, settings) {
 
+            self.svg = svg;
+            self.force = d3.layout.force()
+                .charge(-50)
+                .size([svg.attr("width") - margin.left - margin.right,
+                    svg.attr("height") - margin.top - margin.bottom]);
 
-        node.call(force.drag);
+            self.teams = netball.data.getTeams(data);
+            self.teamNames = netball.data.getTeamNames();
 
-        node.append("text")
-            .attr("class", "team-node-text")
-            .text(function (team){
-                return team.name;
-            });
-
-        var link = svg.selectAll(".link")
-            .data(links)
-          .enter().append("text")
-            .attr("class", "link")
-            .text( function (link) {
-                return parseFloat(link.wLRatio).toFixed(2);
-            });
-
-        // after the force layout's calculations are done?
-        force.on("tick", function () {
-            // move teams to right place
-            svg.selectAll(".team-node-circle")
-                .attr("cx", function (d) {
-                    return d.x;
+            var node = svg.selectAll(".team")
+                .data(self.teams)
+              .enter().append("g")
+                .attr("class", "team noselect")
+                .attr("id", function (d, i){
+                    return "team-"+i;
                 })
-                .attr("cy", function (d) {
-                    return d.y;
+                .on("click", function(d){
+                    self.singleTeamView(d);
                 });
 
-            svg.selectAll(".team-node-text")
-                .attr("x", function (d){
-                    return d.x;
+            node.append("circle")
+                .attr("class", "team-node-circle")
+                .attr("r", function (team) {
+                    return team.ratio * maxR;
                 })
-                .attr("y", function (d) {
-                    return d.y;
+                .attr("fill", function (d) {
+                    return d3.rgb(Math.random()*255, Math.random()*255, Math.random()*255).toString();
+                })
+                .attr("id", function (d, i) {
+                    return "circle-" + i;
                 });
 
-            // svg.selectAll(".link")
-            //     .attr("x", function (d){
-            //         return Math.abs((d.source.x + d.target.x)/2);
-            //     })
-            //     .attr("y", function (d){
-            //         return Math.abs((d.source.y + d.target.y)/2);
-            //     });
-        });
+            node.append("text")
+                .attr("class", "team-node-text")
+                .text(function (team){
+                    return team.name;
+                });
 
-        force.start();
+            node.call(self.force.drag);
+
+            // default view for this force layout
+            self.fullTeamView();
+            // starts the force physics
+            self.force.start();
+        }
+
+        // show rivalries between all teams at once
+        self.fullTeamView = function (){
+            // make links
+            var links = [];
+            self.teams.forEach( function (team, index){
+                for (var opponentName in team.opponents){
+                    var opponent = team.opponents[opponentName];
+                    var sourceIndex = index;
+                    var targetIndex = self.teamNames.indexOf(opponentName);
+
+                    // if link is not already made, add to links
+                    if ((sourceIndex !== targetIndex) &&
+                        !containsLink(links, {source: sourceIndex, target: targetIndex })){
+                        links.push({
+                            source: sourceIndex,
+                            target: targetIndex,
+                            wLRatio: opponent.ratio
+                        });
+                    }
+                }
+            });
+
+            self.force.linkDistance(function (link){
+                // wl ratio of totally even is 0.5
+                // so we get distance to 0.5 represented in range 0 - 1
+                var difference = ratioToDifference(link.wLRatio);
+
+                // radii of circles
+                var srcRad = +self.svg.select("#circle-" + link.source.index).attr("r");
+                var targetRad = +self.svg.select("#circle-" + link.target.index).attr("r");
+
+                var minDist = srcRad + targetRad;
+                var maxDist = 500;
+
+                // scale difference in wl ratio to distance apart
+                var scale = d3.scale.linear().domain([0, 1]).range([minDist, maxDist]);
+                var scaled = scale(difference);
+
+                // console.log(link.source.name + " <-> " + link.target.name
+                //     + "\nMin Dist: " + minDist
+                //     + "\nActual Dist: " + scaled
+                //     + "\nDiff: " + difference);
+
+                return scaled;
+            });
+
+            // reset mouse listeners on nodes
+            self.svg.selectAll(".team")
+                .on("mouseover", null)
+                .on("mouseout", null);
+
+            self.force.linkStrength(1.0);
+
+            // bind nodes and links to the force graph
+            self.force.nodes(self.teams);
+            self.force.charge(-150);
+            self.force.links(links);
+            self.force.gravity(0.1);
+
+            self.force.on("tick", function () {
+                // move teams to right place
+                self.svg.selectAll(".team-node-circle")
+                    .attr("cx", function (d) {
+                        return d.x;
+                    })
+                    .attr("cy", function (d) {
+                        return d.y;
+                    });
+
+                self.svg.selectAll(".team-node-text")
+                    .attr("x", function (d){
+                        return d.x;
+                    })
+                    .attr("y", function (d) {
+                        return d.y;
+                    });
+            });
+
+        }
+
+        // changes vis to be centered on one team
+        // team param is the name of a team
+        self.singleTeamView = function (team) {
+            // links change to only be to chosen team
+            var teamIndex = self.teamNames.indexOf(team.name);
+            var selector = "#team"+teamIndex;
+
+            var links = [];
+            self.teams.forEach( function (otherTeam, index){
+                if (otherTeam.name === team.name) return;
+                links.push({
+                    source: index,
+                    target: teamIndex
+                });
+            });
+
+            self.force.links(links);
+            self.force.linkDistance(200);
+            self.force.charge(-500);
+            self.force.gravity(0.01);
+
+            // change size of circles to be win loss
+            // vs chosen team
+            self.svg.selectAll(".team-node-circle")
+                .transition()
+                .ease("bounce")
+                .duration(800)
+                .attr("r", function (d){
+                    // don't change central team circle's radius
+                    if (d.name !== team.name){
+                        var thisTeam = getTeam(self.teams, d.name);
+                        var ratio = thisTeam.opponents[team.name].ratio;
+                        return ratio * maxR;
+                    } else {
+                        // (what it used to be)
+                        return d.ratio * maxR;
+                    }
+                });
+
+            self.svg.selectAll(".force-line").remove();
+
+            // add lines (invisible at first)
+            var line = self.svg.selectAll(".force-line")
+                .data(self.force.links())
+              .enter().append("line")
+                .attr("class", "force-line")
+                .attr("id", function (d, i){
+                    return "force-line-" + d.source;
+                })
+                .style("stroke", "black")
+                .style("stroke-width", function (d){
+                    return d.wLRatio;
+                })
+                .style("opacity", "0");
+
+            // add mouse listening
+            var node = self.svg.selectAll(".team:not("+selector+")")
+                .on("mouseover", function(d, i){
+                    var linkLine = self.svg.select("#force-line-"+d.index);
+                    linkLine.transition()
+                        .style("opacity", "1");
+                })
+                .on("mouseout", function (d, i){
+                    var linkLine = self.svg.select("#force-line-"+d.index);
+                    linkLine.transition()
+                        .style("opacity", "0");
+                });
+
+            self.force.on("tick", function (){
+                line.attr("x1", function(d) { return d.source.x; })
+                        .attr("y1", function(d) { return d.source.y; })
+                        .attr("x2", function(d) { return d.target.x; })
+                        .attr("y2", function(d) { return d.target.y; });
+
+                // copied from above
+                // move teams to right place
+                self.svg.selectAll(".team-node-circle")
+                    .attr("cx", function (d) {
+                        return d.x;
+                    })
+                    .attr("cy", function (d) {
+                        return d.y;
+                    });
+
+                self.svg.selectAll(".team-node-text")
+                    .attr("x", function (d){
+                        return d.x;
+                    })
+                    .attr("y", function (d) {
+                        return d.y;
+                    });
+            });
+
+            self.force.start();
+        }
+
+        return self;
+    })({});
+
+    // wl ratio of totally even is 0.5
+    // so we get distance to 0.5 represented in range 0 - 1
+    function ratioToDifference(ratio) {
+        return Math.abs(ratio - 0.5) * 2;
     }
-
     // returns true if links contains an equivilent link
     function containsLink(links, link){
         for (var i = 0; i < links.length; i++){
@@ -216,6 +330,16 @@
                 return true;
         }
         return false;
+    }
+
+    // get team from teams array given a name
+    function getTeam(teams, teamName){
+        var team;
+        teams.forEach(function (elem){
+            if (elem.name === teamName)
+                team = elem;
+        });
+        return team;
     }
 
 })(netball.visuals = netball.visuals || {});
