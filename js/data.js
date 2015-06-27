@@ -14,8 +14,64 @@
             "Queensland Firebirds"
         ];
 
+    var courtNames = [
+            "TSB Bank Arena, Wellington",
+            "Brisbane Convention & Exhibition Centre",
+            "Trusts Stadium, Auckland",
+            "Energy Events Centre, Rotorua",
+            "Acer Arena, Sydney",
+            "Westpac Centre, Christchurch",
+            "State Netball and Hockey Centre,Melbourne",
+            "Challenge Stadium, Perth",
+            "Newcastle Entertainment Centre",
+            "Vodafone Arena, Melbourne",
+            "Westpac Arena, Christchurch",
+            "Mystery Creek Events Centre,Hamilton",
+            "ETSA Park, Adelaide",
+            "Sydney Olympic Park Sports Centre",
+            "Stadium Southland, Invercargill",
+            "Arena Manawatu, Palmerston North",
+            "Edgar Centre, Dunedin",
+            "North Shore Events Centre, Auckland",
+            "Pettigrew Green Arena, Napier",
+            "State Netball and Hockey Centre, Melbourne",
+            "Brisbane Convention and Exhibition Centre",
+            "Queen Elizabeth Youth Centre, Tauranga",
+            "The Edgar Centre, Dunedin",
+            "Mystery Creek Events Centre, Hamilton",
+            "Hisense Arena, Melbourne",
+            "Te Rauparaha Arena, Porirua",
+            "Adelaide Arena, Adelaide",
+            "Gold Coast Convention and Exhibition Centre",
+            "State Sports Centre, Sydney",
+            "Vector Arena, Auckland",
+            "Adelaide Entertainment Centre",
+            "CBS Canterbury Arena, Christchurch",
+            "Energy Events Centre, Rotorua*",
+            "Invercargill ILT Velodrome",
+            "Taupo Events Centre",
+            "Netball SA Stadium, Adelaide",
+            "Stadium Southland Velodrome,Invercargill",
+            "Claudelands Arena, Hamilton",
+            "Lion Foundation Arena, Dunedin",
+            "TECT Arena, Tauranga",
+            "Allphones Arena, Sydney",
+            "Te Rauparaha, Porirua",
+            "Rod Laver Arena, Melbourne",
+            "Trafalgar Centre, Nelson",
+            "ASB Baypark Arena, Tauranga",
+            "Perth Arena, Perth",
+            "Claudelands Arena, Waikato",
+            "State Netball Hockey Centre, Melbourne",
+            "Adelaide Entertainment Centre, Adelaide"
+        ];
+
     self.getTeamNames = function () {
         return teamNames;
+    }
+
+    self.getCourtNames = function () {
+        return courtNames;
     }
 
     self.teamGames = function (games) {
