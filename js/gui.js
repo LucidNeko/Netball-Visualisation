@@ -2,8 +2,10 @@
 
 (function (self) {
 
-	var currentYear = "all"
-	var currentVis = "rivals"
+	var settings = {
+		year: "all",
+		visualisation: "rivals"
+	}
 
 	var onReady = function (data) {
 		self.data = data;
@@ -15,37 +17,43 @@
 					.attr("height", height)
                     .attr("transform", "translate(0,0)");
 
-        self.onVisChange(currentVis);
+        self.onVisChange(settings.visualisation);
 	}
 
 	self.onVisChange = function (label) {
+		//update settings
+		settings.visualisation = label;
 		//clear the svg
 		d3.select("#vis-svg").selectAll("*").remove();
 		//display new visualisation
-		switch(label) {
+		switch(settings.visualisation) {
 		case "rivals" :
 			var rivals = netball.visuals.rivals;
-            rivals.setup(self.data, d3.select("#vis-svg"));
+            rivals.setup(self.data, d3.select("#vis-svg"), settings);
 			break;
 		case "scores" :
-			netball.visuals.scoreVis(self.data, d3.select("#vis-svg"), { year: currentYear });
+			netball.visuals.scoreVis(self.data, d3.select("#vis-svg"), settings);
 			break;
 		}
-		currentVis = label;
 	}
 
 	self.onYearChange = function (year) {
 		// console.log(year);
-		currentYear = year;
+		settings.year = year;
 		d3.select("#vis-svg").selectAll("*").remove();
 		switch(currentVis) {
 		case "rivals" :
-            /*rivals.update(year);*/
+            netball.visuals.rivals.update(settings);
 			break;
 		case "scores" :
-			netball.visuals.scoreVis(self.data, d3.select("#vis-svg"), { year: currentYear });
+			netball.visuals.scoreVis(self.data, d3.select("#vis-svg"), settings);
 			break;
 		}
+	}
+
+	self.onTeamSelectionChange = function (div) {
+		//div contains all the team selectables
+		
 	}
 
 	//calls onReady with the data once ready.
