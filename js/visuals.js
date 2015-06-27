@@ -100,6 +100,8 @@
             self.teams = netball.data.getTeams(data);
             self.teamNames = netball.data.getTeamNames();
 
+            var colour = d3.scale.category20();
+
             var node = svg.selectAll(".team")
                 .data(self.teams)
               .enter().append("g")
@@ -117,7 +119,7 @@
                     return team.ratio * maxR;
                 })
                 .attr("fill", function (d) {
-                    return d3.rgb(Math.random()*255, Math.random()*255, Math.random()*255).toString();
+                    return colour(d.name);
                 })
                 .attr("id", function (d, i) {
                     return "circle-" + i;
@@ -129,12 +131,13 @@
                     return team.name;
                 });
 
+            // add nodes to the graph
+            self.force.nodes(self.teams);
+
             node.call(self.force.drag);
 
             // default view for this force layout
             self.fullTeamView();
-            // starts the force physics
-            self.force.start();
         }
 
         // show rivalries between all teams at once
@@ -183,6 +186,18 @@
                 return scaled;
             });
 
+            self.svg.selectAll(".team-node-circle")
+                .transition()
+                .duration(800)
+                .ease("cubic-out")
+                .attr("r", function (d){
+                    return d.ratio * maxR;
+                });
+
+            // remove possible old elements
+            self.svg.selectAll(".force-line").remove();
+            self.svg.select("#back-button").remove();
+
             // reset mouse listeners on nodes
             self.svg.selectAll(".team")
                 .on("mouseover", null)
@@ -191,15 +206,17 @@
             self.force.linkStrength(1.0);
 
             // bind nodes and links to the force graph
-            self.force.nodes(self.teams);
-            self.force.charge(-150);
             self.force.links(links);
+            self.force.charge(-150);
             self.force.gravity(0.1);
 
             self.force.on("tick", function () {
                 // move teams to right place
                 defaultTick();
             });
+
+            // start the simulation
+            self.force.start();
         }
 
         // changes vis to be centered on one team
@@ -241,8 +258,6 @@
                     }
                 });
 
-            self.svg.selectAll(".force-line").remove();
-
             // add lines (invisible at first)
             var line = self.svg.selectAll(".force-line")
                 .data(self.force.links())
@@ -278,6 +293,21 @@
                         .attr("y2", function(d) { return d.target.y; });
 
             });
+
+            // remove old stuff
+            self.svg.select("#back-button").remove();
+
+            // add back button
+            var back = self.svg.append("g")
+                .attr("id", "back-button")
+                .attr("transform", "translate(" + 100 + ", " + 100 + ")")
+                .on("click", function(){
+                    self.fullTeamView();
+                });
+
+            back.append("text")
+                .attr("id", "back-button-text")
+                .text("Back");
 
             self.force.start();
         }

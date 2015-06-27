@@ -106,3 +106,9 @@ body {
 .radio-toolbar input[type="radio"]:checked + label { 
     background-color:#bbb;
 }
+
+#back-button-text {
+    /*background: steelblue;*/
+    fill: steelblue;
+    /*stroke: blue;*/
+}
