@@ -198,23 +198,8 @@
 
             self.force.on("tick", function () {
                 // move teams to right place
-                self.svg.selectAll(".team-node-circle")
-                    .attr("cx", function (d) {
-                        return d.x;
-                    })
-                    .attr("cy", function (d) {
-                        return d.y;
-                    });
-
-                self.svg.selectAll(".team-node-text")
-                    .attr("x", function (d){
-                        return d.x;
-                    })
-                    .attr("y", function (d) {
-                        return d.y;
-                    });
+                defaultTick();
             });
-
         }
 
         // changes vis to be centered on one team
@@ -286,31 +271,22 @@
                 });
 
             self.force.on("tick", function (){
+                defaultTick();
                 line.attr("x1", function(d) { return d.source.x; })
                         .attr("y1", function(d) { return d.source.y; })
                         .attr("x2", function(d) { return d.target.x; })
                         .attr("y2", function(d) { return d.target.y; });
 
-                // copied from above
-                // move teams to right place
-                self.svg.selectAll(".team-node-circle")
-                    .attr("cx", function (d) {
-                        return d.x;
-                    })
-                    .attr("cy", function (d) {
-                        return d.y;
-                    });
-
-                self.svg.selectAll(".team-node-text")
-                    .attr("x", function (d){
-                        return d.x;
-                    })
-                    .attr("y", function (d) {
-                        return d.y;
-                    });
             });
 
             self.force.start();
+        }
+
+        function defaultTick(){
+            self.svg.selectAll(".team")
+                .attr("transform", function (d) {
+                    return "translate( " + d.x + ", " + d.y + ")";
+                });
         }
 
         return self;
