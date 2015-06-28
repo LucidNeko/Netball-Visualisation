@@ -29,6 +29,19 @@ body {
 
 .team-node-text {
 	font: sans-serif;
+    text-anchor: middle;
+}
+
+.wl-text {
+    font-size: 14;
+}
+
+#win-text {
+    fill: green;
+}
+
+#loss-text {
+    fill: red;
 }
 
 .team-node-circle {

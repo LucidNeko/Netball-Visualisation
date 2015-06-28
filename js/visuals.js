@@ -111,6 +111,13 @@
                 })
                 .on("click", function(d){
                     self.singleTeamView(d);
+                })
+                .on("mouseover.wl", function (d){
+                    var parent = self.svg.select("#" + this.id);
+                    addWLText(parent);
+                })
+                .on("mouseout.wl", function(d){
+                    node.select("#wl-tip").remove();
                 });
 
             node.append("circle")
@@ -129,6 +136,10 @@
                 .attr("class", "team-node-text")
                 .text(function (team){
                     return team.name;
+                })
+                .attr("y", function (team){
+                    var r = team.ratio * maxR;
+                    return -(r + 3);
                 });
 
             // add nodes to the graph
@@ -262,6 +273,9 @@
                     }
                 });
 
+            // remove old lines
+            self.svg.selectAll(".force-line").remove();
+
             // add lines (invisible at first)
             var line = self.svg.selectAll(".force-line")
                 .data(self.force.links())
@@ -304,14 +318,22 @@
             // add back button
             var back = self.svg.append("g")
                 .attr("id", "back-button")
-                .attr("transform", "translate(" + 100 + ", " + 100 + ")")
+                .attr("transform", "translate(" + 50 + ", " + 50 + ")")
                 .on("click", function(){
                     self.fullTeamView();
                 });
 
+            back.append("rect")
+                .attr("width", 50)
+                .attr("height", 25)
+                .style("opacity", 0.3);
+
             back.append("text")
                 .attr("id", "back-button-text")
-                .text("Back");
+                .text("Back")
+                .attr("x", 5)
+                .attr("y", 15);
+
 
             self.force.start();
         }
@@ -323,34 +345,61 @@
                 });
         }
 
+        function addWLText(parent){
+            var wLText = parent.append("g")
+                .attr("id", "wl-tip");
+
+            var gap = 10,
+                textLength = 15,
+                textHeight = 14;
+
+            wLText.append("text")
+                .attr("class", "wl-text")
+                .attr("id", "win-text")
+                .text(function (d){
+                    return d.wins + "\t";
+                })
+                .attr("x", -gap/2 - textLength)
+                .attr("y", textHeight/2);
+
+            wLText.append("text")
+                .attr("class", "wl-text")
+                .attr("id", "loss-text")
+                .text(function (d){
+                    return d.losses;
+                })
+                .attr("x", gap/2)
+                .attr("y", textHeight/2);
+        }
+        // wl ratio of totally even is 0.5
+        // so we get distance to 0.5 represented in range 0 - 1
+        function ratioToDifference(ratio) {
+            return Math.abs(ratio - 0.5) * 2;
+        }
+        // returns true if links contains an equivilent link
+        function containsLink(links, link){
+            for (var i = 0; i < links.length; i++){
+                var elem = links[i];
+                if ((elem.source === link.source && elem.target === link.target) ||
+                    (elem.source === link.target && elem.target === link.source))
+                    return true;
+            }
+            return false;
+        }
+
+        // get team from teams array given a name
+        function getTeam(teams, teamName){
+            var team;
+            teams.forEach(function (elem){
+                if (elem.name === teamName)
+                    team = elem;
+            });
+            return team;
+        }
+
         return self;
     })({});
 
-    // wl ratio of totally even is 0.5
-    // so we get distance to 0.5 represented in range 0 - 1
-    function ratioToDifference(ratio) {
-        return Math.abs(ratio - 0.5) * 2;
-    }
-    // returns true if links contains an equivilent link
-    function containsLink(links, link){
-        for (var i = 0; i < links.length; i++){
-            var elem = links[i];
-            if ((elem.source === link.source && elem.target === link.target) ||
-                (elem.source === link.target && elem.target === link.source))
-                return true;
-        }
-        return false;
-    }
-
-    // get team from teams array given a name
-    function getTeam(teams, teamName){
-        var team;
-        teams.forEach(function (elem){
-            if (elem.name === teamName)
-                team = elem;
-        });
-        return team;
-    }
 
     self.courts = (function (self) {
 
@@ -361,7 +410,7 @@
             // console.log(data);
 
             //tally wins in courts
-            data.map(function (d) { 
+            data.map(function (d) {
                 if(d.score.home < d.score.away) {
                     //home lost
                     //add venue with 1 win, or increment venues wins by 1
@@ -437,7 +486,7 @@
                 .size([diameter - 4, diameter - 4])
                 .value(function(d) { return d.wins; });
 
-            var svg = self.svg;            
+            var svg = self.svg;
 
             //adapted from the example from http://bl.ocks.org/mbostock/4063530
 
