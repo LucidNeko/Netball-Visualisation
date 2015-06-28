@@ -18,6 +18,20 @@
                     .attr("transform", "translate(0,0)");
 
         self.onVisChange(settings.visualisation);
+
+        //load images
+        var head = d3.select("#team-logo-container");
+
+        netball.data.getTeamImages().forEach(function (imageName) {
+        	head.append("img")
+        		.attr("class", "team-logo")
+        		.attr("src", "img/team/" + imageName)
+        		.attr("title", imageName.substring(0, imageName.length -4));
+        });
+
+        //add tooltip
+
+        self.giveToolTip(".team-logo");
 	}
 
 	self.onVisChange = function (label) {
@@ -52,6 +66,8 @@
 			netball.visuals.scoreVis(self.data, d3.select("#vis-svg"), settings);
 			break;
 		case "courts" :
+			// d3.select("#vis-svg").selectAll("*").remove();
+			// netball.visuals.courts.setup(self.data, d3.select("#vis-svg"), settings);
 			netball.visuals.courts.update(settings);
 			break;
 		}
@@ -60,6 +76,26 @@
 	self.onTeamSelectionChange = function (div) {
 		//div contains all the team selectables
 
+	}
+
+	self.giveToolTip = function (selector) {
+		//jquery adapted from: http://stackoverflow.com/questions/6629294/tooltip-jquery
+
+        $(selector).mouseover(function(e) { // no need to point to 'rel'. Just if 'a' has [title] attribute.
+
+                tip = $(this).attr('title'); // tip = this title   
+                $(this).attr('title','');    // empty title
+                $('.tooltip').fadeTo(300, 0.9).children('.tipBody').html( tip ); // fade tooltip and populate .tipBody
+
+            }).mousemove(function(e) {
+
+                $('.tooltip').css('top', e.pageY + 10 ); // mouse follow!
+                $('.tooltip').css('left', e.pageX + 20 );
+
+            }).mouseout(function(e) {
+                $('.tooltip').hide(); // mouseout: HIDE Tooltip (do not use fadeTo or fadeOut )
+                $(this).attr( 'title', tip ); // reset title attr
+            }); 
 	}
 
 	//calls onReady with the data once ready.

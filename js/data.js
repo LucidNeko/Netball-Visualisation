@@ -66,12 +66,29 @@
             "Adelaide Entertainment Centre, Adelaide"
         ];
 
+    var teamImages = [ 
+            "Adelaide Thunderbirds.jpg",
+            "Canterbury Tactix.jpg",
+            "Central Pulse.jpg",
+            "Melbourne Vixens.jpg",
+            "New South Wales Swifts.jpg",
+            "Northern Mystics.jpg",
+            "Queensland Firebirds.jpg",
+            "Southern Steel.jpg",
+            "Waikato Bay of Plenty Magic.jpg",
+            "West Coast Fever.jpg" 
+        ];
+
     self.getTeamNames = function () {
         return teamNames;
     }
 
     self.getCourtNames = function () {
         return courtNames;
+    }
+
+    self.getTeamImages = function () {
+        return teamImages;
     }
 
     self.teamGames = function (games) {
