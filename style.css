@@ -136,6 +136,8 @@ body {
     /*stroke: blue;*/
 }
 
+/* courts adapted from d3 demo */
+
 .circle-courts {
   fill: rgb(31, 119, 180);
   fill-opacity: .25;

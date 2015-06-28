@@ -699,18 +699,21 @@
             filteredData = preFilter(rawData, settings);
             courtsData = formatData(filteredData);
 
+            self.update(settings);
+
             addHelpButton(
                 svg,
                 +svg.attr("width"),
                 +svg.attr("height"),
                 "Number of games won in each court"
             );
-
-            self.update(settings);
         };
 
         self.update = function (settings) {
-            self.svg.selectAll("*").remove();
+            //remove all the things except for the info button
+            self.svg.selectAll("*").filter(function (d, i) {
+                return this.getAttribute("class") === "help" ? null : this;
+            }).remove();
 
             filteredData = preFilter(rawData, settings);
             courtsData = formatData(filteredData);
@@ -761,12 +764,14 @@
             // add help button
             var help = svg.append("g")
                 .attr("id", "help")
+                .attr("class", "help")
                 .attr("transform", "translate("
                       + (x - margin.left - margin.right + 100) + ", "
                       + (y - margin.top - margin.bottom) + ")")
                 .attr("title", text);
 
             help.append("image")
+                .attr("class", "help")
                 .attr("xlink:href", "img/info.png")
                 .attr("width", 40)
                 .attr("height", 40);
