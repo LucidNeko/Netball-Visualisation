@@ -91,12 +91,16 @@
         return teamImages;
     }
 
-    self.teamGames = function (games) {
+    self.teamGames = function (games, year) {
         // make blank team array for each team
         var teams = teamNames.map(function (d){ return []; });
 
         // sort each game into team array
         games.forEach(function (game) {
+            // skip games in wrong year
+            if (year !== "all" && year !== game.year)
+                return;
+
             var homeIndex = teamNames.indexOf(game.homeTeam);
             var awayIndex = teamNames.indexOf(game.awayTeam);
 
@@ -115,18 +119,17 @@
     var cloneGame = function (game, home) {
         var cloned = clone(game);
         if (home){
-            cloned.thisTeam = cloned.homeTeam;
-            cloned.otherTeam = cloned.awayTeam;
+            cloned.thisTeam = game.homeTeam;
+            cloned.otherTeam = game.awayTeam
             cloned.score = { thisTeam: cloned.score.home, otherTeam: cloned.score.away };
         } else {
-            cloned.thisTeam = clone.awayTeam;
-            cloned.otherTeam = clone.homeTeam;
+            cloned.thisTeam = game.awayTeam;
+            cloned.otherTeam = game.homeTeam;
             cloned.score = { thisTeam: cloned.score.away, otherTeam: cloned.score.home };
         }
 
-        delete cloned.homeTeam;
-        delete cloned.awayTeam;
-
+        //delete cloned.homeTeam;
+        //delete cloned.awayTeam;
         return cloned;
     }
 

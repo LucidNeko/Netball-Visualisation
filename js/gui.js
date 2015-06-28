@@ -11,7 +11,7 @@
 		self.data = data;
 
         var width = 1000,
-            height = 600;
+            height = 800;
 		var svg = d3.select("#vis-svg")
 					.attr("width", width)
 					.attr("height", height)
@@ -46,7 +46,8 @@
             rivals.setup(self.data, d3.select("#vis-svg"), settings);
 			break;
 		case "scores" :
-			netball.visuals.scoreVis(self.data, d3.select("#vis-svg"), settings);
+            var score = netball.visuals.scoreVis;
+			score.setup(self.data, d3.select("#vis-svg"), settings);
 			break;
 		case "courts" :
 			netball.visuals.courts.setup(self.data, d3.select("#vis-svg"), settings);
@@ -63,7 +64,7 @@
             netball.visuals.rivals.update(settings);
 			break;
 		case "scores" :
-			netball.visuals.scoreVis(self.data, d3.select("#vis-svg"), settings);
+			netball.visuals.scoreVis.update(settings);
 			break;
 		case "courts" :
 			netball.visuals.courts.update(settings);
