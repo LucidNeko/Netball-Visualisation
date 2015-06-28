@@ -67,8 +67,6 @@
 			netball.visuals.scoreVis.update(settings);
 			break;
 		case "courts" :
-			// d3.select("#vis-svg").selectAll("*").remove();
-			// netball.visuals.courts.setup(self.data, d3.select("#vis-svg"), settings);
 			netball.visuals.courts.update(settings);
 			break;
 		}
