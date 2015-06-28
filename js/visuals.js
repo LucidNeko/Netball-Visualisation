@@ -254,13 +254,18 @@
                 .on("click", function(d){
                     self.singleTeamView(d);
                 })
-                .on("mouseover.wl", function (d){
-                    var parent = self.svg.select("#" + this.id);
-                    addWLText(parent);
-                })
-                .on("mouseout.wl", function(d){
-                    node.select("#wl-tip").remove();
+                .attr("title", function(d){
+                    return "Overall: " + d.wins + "W " + d.losses + "L";
                 });
+
+                netball.gui.giveToolTip(".team");
+                //.on("mouseover.wl", function (d){
+                    //var parent = self.svg.select("#" + this.id);
+                    //addWLText(parent);
+                //})
+                //.on("mouseout.wl", function(d){
+                    //node.select("#wl-tip").remove();
+                //});
 
             node.append("circle")
                 .attr("class", "team-node-circle")
@@ -288,7 +293,7 @@
                 self.svg,
                 +self.svg.attr("width"),
                 +self.svg.attr("height"),
-                "Rivalry across all teams. Click on a team to see 1v1 Rivalry"
+                "Rival teams are clustered together. Click on a team to see 1v1 Rivalry"
             );
             // add nodes to the graph
             self.force.nodes(self.teams);
@@ -345,13 +350,6 @@
                 return scaled;
             });
 
-            //change nodes ratio to be new value.
-            self.force.nodes().forEach(function (d, i) {
-                d.ratio = self.teams[i].ratio;
-                d.wins = self.teams[i].wins;
-                d.losses = self.teams[i].losses;
-            });
-
             self.svg.selectAll(".team-node-circle")
                 .transition()
                 .duration(800)
@@ -360,15 +358,27 @@
                     return d.ratio * maxR;
                 });
 
+            // TODO: doesn't seem to be working
+            self.svg.selectAll(".team-node-text")
+                .transition()
+                .duration(800)
+                .attr("y", function(d, i){
+                    var r = d.ratio * maxR;
+                    return -(r + 3);
+                });
+
+            self.svg.selectAll(".team").attr("title", function(d){
+                return "Overall: " + d.wins + "W " + d.losses + "L";
+            });
 
             // remove possible old elements
             self.svg.selectAll(".force-line").remove();
             self.svg.select("#back-button").remove();
 
             // reset mouse listeners on nodes
-            self.svg.selectAll(".team")
-                .on("mouseover", null)
-                .on("mouseout", null);
+            //self.svg.selectAll(".team")
+                //.on("mouseover", null)
+                //.on("mouseout", null);
 
             self.force.linkStrength(1.0);
 
@@ -426,6 +436,15 @@
                     }
                 });
 
+            // TODO: doesn't seem to be working
+            self.svg.selectAll(".team-node-text")
+                .transition()
+                .duration(800)
+                .attr("y", function(d, i){
+                    var r = d.ratio * maxR;
+                    return -(r + 3);
+                });
+
             // remove old lines
             self.svg.selectAll(".force-line").remove();
 
@@ -449,6 +468,18 @@
                     var linkLine = self.svg.select("#force-line-"+d.index);
                     linkLine.transition()
                         .style("opacity", "1");
+
+                    //d3.select(this).append("text")
+                        //.text(function (d, i){
+                            //var opponentName = self.teamNames.get(teamIndex);
+                            //return d.opponents[opponentName].wins;
+                        //});
+
+                    //self.svg.select(selector)
+                        //.append("text")
+                        //.text(function (d){
+                            //return
+//})
                 })
                 .on("mouseout", function (d, i){
                     var linkLine = self.svg.select("#force-line-"+d.index);
@@ -479,7 +510,7 @@
             back.append("rect")
                 .attr("width", 50)
                 .attr("height", 25)
-                .style("opacity", 0.3);
+                .style("opacity", 0.1);
 
             back.append("text")
                 .attr("id", "back-button-text")
@@ -498,10 +529,19 @@
         self.update = function(settings){
             var year = settings.year;
             self.teams = netball.data.getTeams(self.games, year);
+
+            //change nodes ratio to be new value.
+            self.force.nodes().forEach(function (d, i) {
+                d.ratio = self.teams[i].ratio;
+                d.wins = self.teams[i].wins;
+                d.losses = self.teams[i].losses;
+            });
+
             if (self.mode === "fullTeamView")
                 self.fullTeamView();
             else if (self.mode === "singleTeamView")
                 self.singleTeamView(self.singleTeam);
+
         }
 
         function defaultTick(){
