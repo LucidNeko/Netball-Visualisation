@@ -32,6 +32,27 @@
         //add tooltip
 
         self.giveToolTip(".team-logo");
+
+        //add year selection buttons to page
+        var years = netball.parser.dataFiles.map(function (d) {
+        	return d.substring(5, 9); //extract year from filename
+        }).reverse();
+
+        var container = d3.select("#vis-container")
+        
+        years.forEach(function (year) {
+        	container.append("input")
+        		.attr("onchange", "netball.gui.onYearChange(value)")
+        		.attr("id", "year-" + year)
+        		.attr("type", "radio")
+        		.attr("name", "year")
+        		.attr("value", year);
+
+       		container.append("label")
+        		.attr("class", "noselect season-option")
+        		.attr("for", "year-" + year)
+        		.text(year);
+        });
 	}
 
 	self.onVisChange = function (label) {

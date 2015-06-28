@@ -2,12 +2,12 @@
 
 (function (self) {
 
-	var dataFiles = [ "data/2008-Table1.csv",
-					  "data/2009-Table1.csv",
-					  "data/2010-Table1.csv",
-					  "data/2011-Table1.csv",
-					  "data/2012-Table1.csv",
-					  "data/2013-Table1.csv" ];
+	self.dataFiles = [ "data/2008-Table1.csv",
+					   "data/2009-Table1.csv",
+					   "data/2010-Table1.csv",
+					   "data/2011-Table1.csv",
+					   "data/2012-Table1.csv",
+					   "data/2013-Table1.csv" ];
 
 	var getYearFromFilename = function (filename) {
 		return +filename.substring(5, 9);
@@ -92,7 +92,7 @@
 	};
 
 	self.loadData = function () {
-		return Promise.all(dataFiles.map(function (filename) {
+		return Promise.all(self.dataFiles.map(function (filename) {
 			return new Promise(function (resolve) {
 				d3.csv(filename, resolve);
 			}).then(function (data) {
