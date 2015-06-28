@@ -84,7 +84,7 @@
                 .text("Score difference");
 
             self.lines = g.append("g")
-                .attr("class", "team-line");
+                .attr("class", "team-lines");
 
 
             // make line for each team
@@ -92,14 +92,22 @@
             teamGames.forEach(function (team, i) {
                 self.lines.append("path")
                     .datum(team)
-                    .attr("class", "team-line-"+i)
+                    .attr("class", "team-line")
+                    .attr("id", "team-line-"+i)
                     .attr("d", self.line)
                     .attr("stroke", colour(i))
                     .attr("title", function (team){
                         return team.thisTeam;
                     })
-                    .attr("data-legend", function(d, i){
-                        return d.thisTeam;
+                    .on("mouseover", function(d){
+                        spotlightLine(i);
+                        //console.log(d);
+                    })
+                    .on("mouseout", function(d){
+                        unspotlightLine(i);
+                    })
+                    .each(function(d, i){
+                        //console.log(i);
                     });
             });
 
@@ -109,7 +117,7 @@
                 .attr("x", width)
                 .attr("y", 20)
                 .attr("width", 200)
-                .attr("height", 500)
+                .attr("height", 500);
 
              legend.selectAll("g").data(teamGames)
               .enter()
@@ -131,10 +139,16 @@
                   .attr("width", 100)
                   .style("fill", colour(i))
                   .text(function (d){
-                  console.log(d);
                         return d[0].thisTeam;
                   });
+
               })
+              .on("mouseover", function (d, i){
+                    spotlightLine(i);
+                })
+              .on("mouseout", function(d, i){
+                    unspotlightLine(i);
+                });
         }
 
         // update the graph with new time and team settings
@@ -179,7 +193,22 @@
                     .datum(team)
                     .attr("d", self.line);
             });
+        }
 
+        function spotlightLine(i){
+            var selector = ".team-line:not(#team-line-"+i+")";
+            var lines = self.svg.selectAll(selector);
+            lines.transition()
+                .duration(200)
+                .style("opacity", 0.2);
+        }
+
+        function unspotlightLine(i){
+            var selector = ".team-line:not(#team-line-"+i+")";
+            var lines = self.svg.selectAll(selector);
+            lines.transition()
+                .duration(200)
+                .style("opacity", 1);
         }
 
         return self;
@@ -519,7 +548,7 @@
     self.courts = (function (self) {
 
         //create tooltip div
-        $('body').append('<div class="tooltip"><div class="tipBody"></div></div>'); 
+        $('body').append('<div class="tooltip"><div class="tipBody"></div></div>');
 
         var rawData;
         var filteredData;
@@ -643,7 +672,7 @@
                     .attr("title", function(d) { return d.name + (d.children ? "" : ": wins " + format(d.wins)); })
                     .attr("class", "circle-courts")
                     .attr("r", function(d) { return d.r; });
-                  
+
 
               node.filter(function(d) { return !d.children; }).append("text")
                   .attr("class", "ignore-events")

@@ -66,7 +66,7 @@
             "Adelaide Entertainment Centre, Adelaide"
         ];
 
-    var teamImages = [ 
+    var teamImages = [
             "Adelaide Thunderbirds.jpg",
             "Canterbury Tactix.jpg",
             "Central Pulse.jpg",
@@ -76,7 +76,7 @@
             "Queensland Firebirds.jpg",
             "Southern Steel.jpg",
             "Waikato Bay of Plenty Magic.jpg",
-            "West Coast Fever.jpg" 
+            "West Coast Fever.jpg"
         ];
 
     self.getTeamNames = function () {
@@ -91,7 +91,7 @@
         return teamImages;
     }
 
-    self.teamGames = function (games) {
+    self.teamGames = function (games, year) {
         // make blank team array for each team
         var teams = teamNames.map(function (d){ return []; });
 
