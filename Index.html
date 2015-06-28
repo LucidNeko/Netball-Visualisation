@@ -5,11 +5,14 @@
 		<title>Netball Visualisation Nation</title>
         <link rel="stylesheet" href="style.css"/>
 	  	<script src="lib/d3.v3.min.js"></script>
-	  	<script src="lib/jquery."></script>
+        <script src="lib/jquery-2.1.4.js"></script>
 	</head>
 	<body>
 
-        <header><a href="http://www.anz-championship.com"><img src="img/ANZ_Championship_logo_2010.jpg" width="100" height="100" /></a></header>
+        <header>
+            <a href="http://www.anz-championship.com"><img src="img/ANZ_Championship_logo_2010.jpg" width="100" height="100" /></a>
+            <div id="team-logo-container"></div>
+        </header>
         <menu type="list" label="visualisation menu" id="vis-menu">
         <ul id="menu-list" class="radio-toolbar">
         	<li class="vis-item">
@@ -58,5 +61,8 @@
 		<script src="js/gui.js"></script>
         <script src="js/visuals.js"></script>
         <script src="js/data.js"></script>
+        <script>
+        var tip;
+        </script>
 	</body>
 </html>

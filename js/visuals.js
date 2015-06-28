@@ -47,11 +47,15 @@
             //x.domain(d3.extent(data, function (d, i) { return i; }));
             self.x.domain([0, d3.max(teamGames.map(function (d){ return d.length; }))]);
             self.y.domain([
-                d3.max(self.games.map(function (d) {
-                    return Math.max(d.score.home - d.score.away, d.score.away - d.score.home)
+                d3.max(teamGames.map(function (team) {
+                    return d3.max(team.map(function (d){
+                        return Math.max(d.score.thisTeam - d.score.otherTeam, d.score.thisTeam - d.score.otherTeam);
+                    }));
                 })),
-                d3.min(self.games.map(function (d){
-                    return Math.min(d.score.home - d.score.away, d.score.away - d.score.home)
+                d3.min(teamGames.map(function (team) {
+                    return d3.min(team.map(function (d){
+                        return Math.min(d.score.thisTeam - d.score.otherTeam, d.score.thisTeam - d.score.otherTeam);
+                    }));
                 }))
               ]);
 
@@ -87,18 +91,50 @@
             // TODO: do this without loop?
             teamGames.forEach(function (team, i) {
                 self.lines.append("path")
+                    .datum(team)
                     .attr("class", "team-line-"+i)
-                  .datum(team)
                     .attr("d", self.line)
                     .attr("stroke", colour(i))
-                    .attr("title", function (d){
+                    .attr("title", function (team){
                         return team.thisTeam;
+                    })
+                    .attr("data-legend", function(d, i){
+                        return d.thisTeam;
                     });
             });
 
             // add legend
-            //var legend = g.append("g")
-                //.
+            var legend = g.append("g")
+                .attr("class", "legend")
+                .attr("x", width)
+                .attr("y", 20)
+                .attr("width", 200)
+                .attr("height", 500)
+
+             legend.selectAll("g").data(teamGames)
+              .enter()
+              .append("g")
+              .each(function(d, i) {
+                var g = d3.select(this);
+
+                g.append("rect")
+                  .attr("x", width + 50)
+                  .attr("y", i * 25)
+                  .attr("width", 20)
+                  .attr("height", 20)
+                  .style("fill", colour(i));
+
+                g.append("text")
+                  .attr("x", width + 50 + 25)
+                  .attr("y", i * 25 + 16)
+                  .attr("height", 20)
+                  .attr("width", 100)
+                  .style("fill", colour(i))
+                  .text(function (d){
+                  console.log(d);
+                        return d[0].thisTeam;
+                  });
+              })
         }
 
         // update the graph with new time and team settings
@@ -139,15 +175,9 @@
             // update lines
             teamGames.forEach(function (team, i){
                 // TODO: transition
-                self.lines.selectAll(".team-line-"+i).remove();
-                self.lines.append("path")
-                    .attr("class", "team-line-"+i)
-                  .datum(team)
-                    .attr("d", self.line)
-                    .attr("stroke", colour(i))
-                    .attr("title", function (d){
-                        return team.thisTeam;
-                    });
+                self.lines.selectAll(".team-line-"+i)
+                    .datum(team)
+                    .attr("d", self.line);
             });
 
         }
@@ -226,7 +256,8 @@
         }
 
         // show rivalries between all teams at once
-        self.fullTeamView = function (){
+        self.fullTeamView = function (year){
+
             // make links
             var links = [];
             self.teams.forEach( function (team, index){
@@ -416,10 +447,18 @@
         self.update = function(settings){
             var year = settings.year;
             self.teams = netball.data.getTeams(self.games, year);
+
+            //console.log(self.svg.select(".team"));
+            //self.svg.selectAll(".team")
+                //.data(self.teams);
+            //console.log(self.svg.select(".team"));
+
             if (self.mode === "fullTeamView")
                 self.fullTeamView();
             else if (self.mode === "singleTeamView")
                 self.singleTeamView(self.singleTeam);
+
+            console.log(self.teams);
         }
 
         function defaultTick(){
@@ -485,13 +524,182 @@
     })({});
 
 
+    // self.courts = (function (self) {
+
+    //     //create tooltip div
+    //     $('body').append('<div class="tooltip"><div class="tipBody"></div></div>');
+
+    //     var svg;
+
+    //     var rawData;
+    //     var filteredData;
+
+
+
+    //     self.setup = function (data, svg, settings) {
+
+
+
+    //         var teams = {};
+    //         netball.data.getTeamNames().map(function (d) { teams[d] = {}; });
+
+    //         if(settings.year !== "all") {
+    //             var year = +settings.year;
+
+    //             data = data.filter(function (data) {
+    //                 return data.date.getFullYear() === year;
+    //             });
+    //         }
+
+    //         //tally wins in courts
+    //         data.map(function (d) {
+    //             if(d.score.home < d.score.away) {
+    //                 //home lost
+    //                 //add venue with 1 win, or increment venues wins by 1
+    //                 var team = teams[d.awayTeam];
+    //                 team[d.venue] = (d.venue in team) ? team[d.venue]+1 : 1;
+    //             } else if(d.score.home > d.score.away) {
+    //                 //home won
+    //                 var team = teams[d.homeTeam];
+    //                 team[d.venue] = (d.venue in team) ? team[d.venue]+1 : 1;
+    //             } else {
+    //                 //tie (but there are none in the data atm, ignore?)
+    //                 // console.log("tie");
+    //             }
+    //         });
+
+    //         var courts = {};
+    //         netball.data.getCourtNames().map(function (d) { courts[d] = {}; });
+
+    //         //add teams and their wins to courts
+    //         for(var teamName in teams) {
+    //             var team = teams[teamName];
+    //             for(var courtName in team) {
+    //                 courts[courtName][teamName] = team[courtName];
+    //             }
+    //         }
+
+    //         //remove courts with only 1 team
+    //         for(var key in courts) {
+    //             if(Object.keys(courts[key]).length < 2) {
+    //                 delete courts[key];
+    //             }
+    //         }
+
+    //         // console.log(courts);
+
+    //         var clean = {};
+    //         clean.name = "Courts";
+    //         clean.children = [];
+
+    //         for(var key in courts) {
+    //             var obj = {name: key};
+    //             obj.children = [];
+
+    //             for(var team in courts[key]) {
+    //                 var obj2 = {name: team, wins: courts[key][team]};
+    //                 obj.children.push(obj2);
+    //             }
+
+    //             clean.children.push(obj);
+    //         }
+
+
+    //         //clean dataset ready for pack layout
+    //         self.clean = clean;
+
+    //         // console.log(clean);
+
+    //         self.courts = courts;
+    //         self.teams = teams;
+
+    //         self.svg = svg;
+
+
+
+    //         self.update(settings);
+    //     };
+
+    //     self.update = function (settings) {
+    //         var diameter = 760,
+    //             format = d3.format(",d");
+
+    //         var pack = d3.layout.pack()
+    //             .size([diameter - 4, diameter - 4])
+    //             .value(function(d) { return d.wins; });
+
+    //         var svg = self.svg;
+
+    //         //adapted from the example from http://bl.ocks.org/mbostock/4063530
+
+    //         var node = svg.selectAll(".node-courts")
+    //               .data(pack.nodes(self.clean))
+    //             .enter().append("g")
+    //               .attr("class", function(d) { return d.children ? ".node-courts" : "leaf-courts .node-courts"; })
+    //               .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+    //           node.append("title")
+    //               .text(function(d) { return d.name + (d.children ? "" : ": wins " + format(d.wins)); });
+
+    //           node.append("circle")
+    //                 .attr("title", function(d) { return d.name + (d.children ? "" : ": wins " + format(d.wins)); })
+    //                .attr("class", "circle-courts")
+    //               .attr("r", function(d) { return d.r; });
+
+
+    //           node.filter(function(d) { return !d.children; }).append("text")
+    //               .attr("class", "ignore-events")
+    //               .attr("dy", ".3em")
+    //               .style("text-anchor", "middle")
+    //               .text(function(d) { return d.name.substring(0, d.r / 3); });
+
+    //         //jquery adapted from: http://stackoverflow.com/questions/6629294/tooltip-jquery
+
+    //         $(".circle-courts").mouseover(function(e) { // no need to point to 'rel'. Just if 'a' has [title] attribute.
+
+    //                 tip = $(this).attr('title'); // tip = this title
+    //                 $(this).attr('title','');    // empty title
+    //                 $('.tooltip').fadeTo(300, 0.9).children('.tipBody').html( tip ); // fade tooltip and populate .tipBody
+
+    //             }).mousemove(function(e) {
+
+    //                 $('.tooltip').css('top', e.pageY + 10 ); // mouse follow!
+    //                 $('.tooltip').css('left', e.pageX + 20 );
+
+    //             }).mouseout(function(e) {
+    //                 $('.tooltip').hide(); // mouseout: HIDE Tooltip (do not use fadeTo or fadeOut )
+    //                 $(this).attr( 'title', tip ); // reset title attr
+    //             });
+    //     }
+
+    //     return self;
+    // })({});
+
     self.courts = (function (self) {
 
-        self.setup = function (data, svg, settings) {
+        //create tooltip div
+        $('body').append('<div class="tooltip"><div class="tipBody"></div></div>');
+
+        var rawData;
+        var filteredData;
+
+        var courtsData;
+
+        var preFilter = function (data, settings) {
+            if(settings.year === "all") {
+                return data;
+            }
+
+            var year = +settings.year;
+
+            return data = data.filter(function (data) {
+                return data.date.getFullYear() === year;
+            });
+        }
+
+        var formatData = function (data) {
             var teams = {};
             netball.data.getTeamNames().map(function (d) { teams[d] = {}; });
-
-            // console.log(data);
 
             //tally wins in courts
             data.map(function (d) {
@@ -528,8 +736,6 @@
                 }
             }
 
-            // console.log(courts);
-
             var clean = {};
             clean.name = "Courts";
             clean.children = [];
@@ -546,23 +752,26 @@
                 clean.children.push(obj);
             }
 
+            return clean;
+        }
 
-            //clean dataset ready for pack layout
-            self.clean = clean;
-
-            // console.log(clean);
-
-            self.courts = courts;
-            self.teams = teams;
+        self.setup = function (data, svg, settings) {
 
             self.svg = svg;
 
-
+            rawData = data;
+            filteredData = preFilter(rawData, settings);
+            courtsData = formatData(filteredData);
 
             self.update(settings);
         };
 
         self.update = function (settings) {
+            self.svg.selectAll("*").remove();
+
+            filteredData = preFilter(rawData, settings);
+            courtsData = formatData(filteredData);
+
             var diameter = 760,
                 format = d3.format(",d");
 
@@ -574,9 +783,11 @@
 
             //adapted from the example from http://bl.ocks.org/mbostock/4063530
 
-            var node = svg.selectAll(".node-courts")
-                  .data(pack.nodes(self.clean))
-                .enter().append("g")
+            var nodes = svg.selectAll(".node-courts")
+                  .data(pack.nodes(courtsData));
+
+
+            var node = nodes.enter().append("g")
                   .attr("class", function(d) { return d.children ? ".node-courts" : "leaf-courts .node-courts"; })
                   .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
@@ -584,13 +795,20 @@
                   .text(function(d) { return d.name + (d.children ? "" : ": wins " + format(d.wins)); });
 
               node.append("circle")
-                   .attr("class", "circle-courts")
-                  .attr("r", function(d) { return d.r; });
+                    .attr("title", function(d) { return d.name + (d.children ? "" : ": wins " + format(d.wins)); })
+                    .attr("class", "circle-courts")
+                    .attr("r", function(d) { return d.r; });
+
 
               node.filter(function(d) { return !d.children; }).append("text")
+                  .attr("class", "ignore-events")
                   .attr("dy", ".3em")
                   .style("text-anchor", "middle")
                   .text(function(d) { return d.name.substring(0, d.r / 3); });
+
+            nodes.exit().remove();
+
+            netball.gui.giveToolTip(".circle-courts");
         }
 
         return self;

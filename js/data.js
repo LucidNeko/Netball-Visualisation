@@ -66,6 +66,19 @@
             "Adelaide Entertainment Centre, Adelaide"
         ];
 
+    var teamImages = [
+            "Adelaide Thunderbirds.jpg",
+            "Canterbury Tactix.jpg",
+            "Central Pulse.jpg",
+            "Melbourne Vixens.jpg",
+            "New South Wales Swifts.jpg",
+            "Northern Mystics.jpg",
+            "Queensland Firebirds.jpg",
+            "Southern Steel.jpg",
+            "Waikato Bay of Plenty Magic.jpg",
+            "West Coast Fever.jpg"
+        ];
+
     self.getTeamNames = function () {
         return teamNames;
     }
@@ -74,13 +87,17 @@
         return courtNames;
     }
 
+    self.getTeamImages = function () {
+        return teamImages;
+    }
+
     self.teamGames = function (games, year) {
         // make blank team array for each team
         var teams = teamNames.map(function (d){ return []; });
 
         // sort each game into team array
         games.forEach(function (game) {
-            // if not right year, don't add to team games array
+            // skip games in wrong year
             if (year !== "all" && year !== game.year)
                 return;
 
@@ -102,18 +119,17 @@
     var cloneGame = function (game, home) {
         var cloned = clone(game);
         if (home){
-            cloned.thisTeam = cloned.homeTeam;
-            cloned.otherTeam = cloned.awayTeam;
+            cloned.thisTeam = game.homeTeam;
+            cloned.otherTeam = game.awayTeam
             cloned.score = { thisTeam: cloned.score.home, otherTeam: cloned.score.away };
         } else {
-            cloned.thisTeam = clone.awayTeam;
-            cloned.otherTeam = clone.homeTeam;
+            cloned.thisTeam = game.awayTeam;
+            cloned.otherTeam = game.homeTeam;
             cloned.score = { thisTeam: cloned.score.away, otherTeam: cloned.score.home };
         }
 
-        delete cloned.homeTeam;
-        delete cloned.awayTeam;
-
+        //delete cloned.homeTeam;
+        //delete cloned.awayTeam;
         return cloned;
     }
 

@@ -46,6 +46,12 @@ body {
 	stroke-width: 2px;
 }
 
+.legend rect {
+      fill:white;
+      stroke:black;
+      opacity:0.8;
+}
+
 .dull {
     opacity: 0.4;
     filter: alpha(opacity=40); /* msie */
@@ -140,4 +146,42 @@ body {
 .leaf-courts circle {
   fill: #ff7f0e;
   fill-opacity: 1;
+}
+
+.ignore-events {
+    pointer-events:none;
+}
+
+/* tooltip style adapted from: http://stackoverflow.com/questions/6629294/tooltip-jquery */
+
+.tooltip{
+    display:none; /* ADDED */
+    padding:5px 10px;
+    background-color:#e5f4fe;
+    border:#5a5959 1px solid;
+    position:absolute;
+    z-index:9999;
+    color:#0c0c0c;
+    font-size:12px;
+    /*font-size:0.688em;*/
+/*    min-width:100px;
+    min-height:50px;*/
+}
+
+.tipBody {
+    background-color:#e5f4fe;
+    padding:2px;
+}
+
+.team-logo {
+    padding:4px;
+    width: 50px;
+    height: 50px;
+}
+
+#team-logo-container {
+    display: inline-block;
+    position: fixed;
+    top: 30px;
+    padding-left: 15px;
 }
