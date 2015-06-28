@@ -1,89 +1,162 @@
 "use strict";
-// http://bl.ocks.org/mbostock/3883245
+
 (function(self){
 
+    // vis margins
     var margin = {top: 20, right: 20, bottom: 30, left: 50};
 
-    // assume svg is blank
-    self.scoreVis = function (data, svg, settings){
-
-        var width = svg.attr("width") - margin.left - margin.right,
-            height = svg.attr("height") - margin.top - margin.bottom;
-
-        var g = svg.append("g")
-            .attr("class", "score-vis")
-            .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
-
-        var x = d3.time.scale()
-            .range([0, width]);
-
-        var y = d3.scale.linear()
-            .range([0, height]);
-
-        var xAxis = d3.svg.axis()
-            .scale(x)
-            .orient("bottom")
-            .ticks(settings.year === "all" ? d3.time.year : d3.time.month);
-
-        var yAxis = d3.svg.axis()
-            .scale(y)
-            .orient("left");
-
-        var line = d3.svg.line()
-            .x(function (d) { return x(d.date); })
-            .y(function (d) { return y(d.score.thisTeam); });
-
-        x.domain(d3.extent(data, function (d) { return d.date; }));
-        y.domain([
-            d3.max(data.map(function (d) {
-                return Math.max(d.score.home, d.score.away)
-            })),
-            d3.min(data.map(function (d){
-                return Math.min(d.score.home, d.score.away)
-            }))
-          ]);
-
-        g.append("g")
-            .attr("class", "x axis")
-            .attr("transform", "translate (0, " + height + ")")
-            .call(xAxis);
-
-        g.append("g")
-            .attr("class", "y axis")
-            //.attr("transform", "translate (" + margin.left + ", 0)")
-            .call(yAxis)
-                .append("text")
-            .attr("transform", "rotate(-90)")
-            .attr("y", 6)
-            .attr("dy", ".71em")
-            .style("text-anchor", "end")
-            .text("Score");
-
-        var lines = g.append("g")
-            .attr("class", "lines");
-
-        // data arranged into teams
-        var teamGames = netball.data.teamGames(data);
+    // inspired by http://bl.ocks.org/mbostock/3883245
+    // assumes svg is blank
+    self.scoreVis = (function (self){
 
         var colour = d3.scale.category20();
+        // non-repeating things (maybe)
+        self.setup = function (data, svg, settings){
 
-        // make line for each team
-        // TODO: do this without loop?
-        teamGames.forEach(function (team) {
-            lines.append("g")
-                .append("path")
-                .datum(team)
-                .attr("class", "line")
-                .attr("d", line)
-                .attr("stroke", colour(team));
-        });
+            self.games = data;
+            self.svg = svg;
 
-        // add legend
-        //
-    }
+            var width = svg.attr("width") - margin.left - margin.right,
+                height = svg.attr("height") - margin.top - margin.bottom;
+
+            var g = svg.append("g")
+                .attr("class", "score-vis")
+                .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
+
+            self.x = d3.scale.linear()
+                .range([0, width]);
+
+            self.y = d3.scale.linear()
+                .range([0, height]);
+
+            self.xAxis = d3.svg.axis()
+                .scale(self.x)
+                .orient("bottom");
+                //.ticks(settings.year === "all" ? d3.time.year : d3.time.month);
+
+            self.yAxis = d3.svg.axis()
+                .scale(self.y)
+                .orient("left");
+
+            self.line = d3.svg.line()
+                .x(function (d, i) { return self.x(i); })
+                .y(function (d) { return self.y(d.score.thisTeam - d.score.otherTeam); });
+
+            var teamGames = netball.data.teamGames(self.games, settings.year);
+
+            //x.domain(d3.extent(data, function (d, i) { return i; }));
+            self.x.domain([0, d3.max(teamGames.map(function (d){ return d.length; }))]);
+            self.y.domain([
+                d3.max(self.games.map(function (d) {
+                    return Math.max(d.score.home - d.score.away, d.score.away - d.score.home)
+                })),
+                d3.min(self.games.map(function (d){
+                    return Math.min(d.score.home - d.score.away, d.score.away - d.score.home)
+                }))
+              ]);
+
+            // axis
+            g.append("g")
+                .attr("class", "axis")
+                .attr("id", "x-axis")
+                .attr("transform", "translate (0, " + height + ")")
+                .call(self.xAxis)
+                    .append("text")
+                .attr("y", -6)
+                .attr("x", width)
+                .attr("dx", "-.71em")
+                .style("text-anchor", "end")
+                .text("Game");
+
+            g.append("g")
+                .attr("class", "axis")
+                .attr("id", "y-axis")
+                .call(self.yAxis)
+                    .append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 6)
+                .attr("dy", ".71em")
+                .style("text-anchor", "end")
+                .text("Score difference");
+
+            self.lines = g.append("g")
+                .attr("class", "team-line");
+
+
+            // make line for each team
+            // TODO: do this without loop?
+            teamGames.forEach(function (team, i) {
+                self.lines.append("path")
+                    .attr("class", "team-line-"+i)
+                  .datum(team)
+                    .attr("d", self.line)
+                    .attr("stroke", colour(i))
+                    .attr("title", function (d){
+                        return team.thisTeam;
+                    });
+            });
+
+            // add legend
+            //var legend = g.append("g")
+                //.
+        }
+
+        // update the graph with new time and team settings
+        self.update = function(settings){
+
+            // data arranged into teams
+            var teamGames = netball.data.teamGames(self.games, settings.year);
+
+            self.x.domain([0, d3.max(teamGames.map(function (d){ return d.length; }))]);
+            self.y.domain([
+                d3.max(teamGames.map(function (team) {
+                    return d3.max(team.map(function (d){
+                        return Math.max(d.score.thisTeam - d.score.otherTeam, d.score.thisTeam - d.score.otherTeam);
+                    }));
+                })),
+                d3.min(teamGames.map(function (team) {
+                    return d3.min(team.map(function (d){
+                        return Math.min(d.score.thisTeam - d.score.otherTeam, d.score.thisTeam - d.score.otherTeam);
+                    }));
+                }))
+              ]);
+
+            // update axis
+            self.svg.select("#x-axis")
+                .transition()
+                .duration(800)
+                .call(self.xAxis);
+
+            self.svg.select("#y-axis")
+                .transition()
+                .duration(800)
+                .call(self.yAxis);
+
+            self.line
+                .x(function (d, i) { return self.x(i); })
+                .y(function (d) { return self.y(d.score.thisTeam - d.score.otherTeam); });
+
+            // update lines
+            teamGames.forEach(function (team, i){
+                // TODO: transition
+                self.lines.selectAll(".team-line-"+i).remove();
+                self.lines.append("path")
+                    .attr("class", "team-line-"+i)
+                  .datum(team)
+                    .attr("d", self.line)
+                    .attr("stroke", colour(i))
+                    .attr("title", function (d){
+                        return team.thisTeam;
+                    });
+            });
+
+        }
+
+        return self;
+
+    })({});
 
     self.rivals = (function (self) {
-
         // max radius of a team circle
         var maxR = 100;
 
@@ -523,4 +596,5 @@
         return self;
     })({});
 
+    return self;
 })(netball.visuals = netball.visuals || {});

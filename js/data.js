@@ -74,12 +74,16 @@
         return courtNames;
     }
 
-    self.teamGames = function (games) {
+    self.teamGames = function (games, year) {
         // make blank team array for each team
         var teams = teamNames.map(function (d){ return []; });
 
         // sort each game into team array
         games.forEach(function (game) {
+            // if not right year, don't add to team games array
+            if (year !== "all" && year !== game.year)
+                return;
+
             var homeIndex = teamNames.indexOf(game.homeTeam);
             var awayIndex = teamNames.indexOf(game.awayTeam);
 

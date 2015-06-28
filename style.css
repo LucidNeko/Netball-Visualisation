@@ -3,21 +3,19 @@ body {
     color: grey;
 }
 
-.axis path,
-.axis line {
+.axis path {
     fill: none;
     stroke: #000;
-    shape-rendering: crispEdges;
+    /*shape-rendering: crispEdges;*/
+    stroke-width: 1.5px;
 }
 
-.x.axis path {
-    display: none;
-}
-
-.line {
+.team-line {
     fill: none;
     /*stroke: steelblue;*/
-    stroke-width: 1.5px;
+    stroke-width: 3px;
+    /*shape-rendering: crispEdges;*/
+    stroke-linecap: round;
 }
 
 .force-line {
