@@ -1,5 +1,6 @@
 # Netball-Visualisation
 Group project for SWEN303 User Interface Design.
+By Will and Hamish
 
 ##########################
 # To add more data files #
@@ -20,3 +21,10 @@ array. Where **** is the year of the data.
 
 The year selection buttons on the page are dynamically loaded
 at the end of the 'onReady' function in gui.js
+
+Other notes:
+Click on the season radio buttons to change the current seasons
+
+The rivals visualisation can be expanded by clicking on one of the nodes.
+
+Hover over things to see more info
