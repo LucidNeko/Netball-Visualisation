@@ -80,21 +80,21 @@
 	self.giveToolTip = function (selector) {
 		//jquery adapted from: http://stackoverflow.com/questions/6629294/tooltip-jquery
 
-        $(selector).mouseover(function(e) { // no need to point to 'rel'. Just if 'a' has [title] attribute.
+        $(selector).mouseover(function(e) { 
 
-                tip = $(this).attr('title'); // tip = this title
-                $(this).attr('title','');    // empty title
-                $('.tooltip').fadeTo(300, 0.9).children('.tipBody').html( tip ); // fade tooltip and populate .tipBody
+                tip = $(this).attr('title'); //tip is global 
+                $(this).attr('title','');
+                $('.tooltip').fadeTo(300, 0.9).children('.tipBody').html( tip );
 
             }).mousemove(function(e) {
-
-                $('.tooltip').css('top', e.pageY + 10 ); // mouse follow!
+            	//track the mouse location
+                $('.tooltip').css('top', e.pageY + 10 ); 
                 $('.tooltip').css('left', e.pageX + 20 );
 
             }).mouseout(function(e) {
-                $('.tooltip').hide(); // mouseout: HIDE Tooltip (do not use fadeTo or fadeOut )
-                $(this).attr( 'title', tip ); // reset title attr
-            });
+                $('.tooltip').hide();
+                $(this).attr( 'title', tip );
+            }); 
 	}
 
 	//calls onReady with the data once ready.
