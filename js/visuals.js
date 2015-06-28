@@ -149,6 +149,14 @@
               .on("mouseout", function(d, i){
                     unspotlightLine(i);
                 });
+
+
+            addHelpButton(
+                svg,
+                +svg.attr("width"),
+                +svg.attr("height"),
+                "Score difference (team score - opponent score) for all teams across the season/s"
+            );
         }
 
         // update the graph with new time and team settings
@@ -189,7 +197,7 @@
             // update lines
             teamGames.forEach(function (team, i){
                 // TODO: transition
-                self.lines.selectAll(".team-line-"+i)
+                self.lines.select("#team-line-"+i)
                     .datum(team)
                     .attr("d", self.line);
             });
@@ -276,6 +284,12 @@
                     return -(r + 3);
                 });
 
+            addHelpButton(
+                self.svg,
+                +self.svg.attr("width"),
+                +self.svg.attr("height"),
+                "Rivalry across all teams. Click on a team to see 1v1 Rivalry"
+            );
             // add nodes to the graph
             self.force.nodes(self.teams);
 
@@ -637,6 +651,13 @@
             filteredData = preFilter(rawData, settings);
             courtsData = formatData(filteredData);
 
+            addHelpButton(
+                svg,
+                +svg.attr("width"),
+                +svg.attr("height"),
+                "Number of games won in each court"
+            );
+
             self.update(settings);
         };
 
@@ -687,5 +708,22 @@
 
         return self;
     })({});
+
+    function addHelpButton(svg, x, y, text){
+            // add help button
+            var help = svg.append("g")
+                .attr("id", "help")
+                .attr("transform", "translate("
+                      + (x - margin.left - margin.right + 100) + ", "
+                      + (y - margin.top - margin.bottom) + ")")
+                .attr("title", text);
+
+            help.append("image")
+                .attr("xlink:href", "img/info.png")
+                .attr("width", 40)
+                .attr("height", 40);
+
+            netball.gui.giveToolTip("#help");
+    }
 
 })(netball.visuals = netball.visuals || {});
