@@ -115,7 +115,7 @@
 
     // returns array of teams, each with a name, wl, and wl against all other teams
     // currently just gets win/loss measure
-    self.getTeams = function (games) {
+    self.getTeams = function (games, year) {
 
         var teams = {};
 
@@ -129,6 +129,10 @@
         });
 
         games.forEach( function (game) {
+            // skip if not appropriate year
+            if (year !== "all" && year !== game.year)
+                return;
+
             if (game.score.home > game.score.away){
                 teams[game.homeTeam].wins++;
                 teams[game.homeTeam].opponents[game.awayTeam].wins++;

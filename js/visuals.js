@@ -89,15 +89,16 @@
 
         // stores important objects and creates svg elements
         // and sets non-changing settings
-        self.setup = function (data, svg, settings) {
+        self.setup = function (games, svg, settings) {
 
+            self.games = games;
             self.svg = svg;
             self.force = d3.layout.force()
                 .charge(-50)
                 .size([svg.attr("width") - margin.left - margin.right,
                     svg.attr("height") - margin.top - margin.bottom]);
 
-            self.teams = netball.data.getTeams(data);
+            self.teams = netball.data.getTeams(games, settings.year);
             self.teamNames = netball.data.getTeamNames();
 
             var colour = d3.scale.category20();
@@ -149,10 +150,6 @@
 
             // default view for this force layout
             self.fullTeamView();
-        }
-
-        self.update = function (settings) {
-            console.log("rivals.update is incomplete -Hamish");
         }
 
         // show rivalries between all teams at once
@@ -231,6 +228,7 @@
             });
 
             // start the simulation
+            self.mode = "fullTeamView";
             self.force.start();
         }
 
@@ -334,8 +332,21 @@
                 .attr("x", 5)
                 .attr("y", 15);
 
-
+            // start the simulation
+            self.singleTeam = team;
+            self.mode = "singleTeamView";
             self.force.start();
+        }
+
+        // trigger an update on the vis.
+        // add or remove teams / years
+        self.update = function(settings){
+            var year = settings.year;
+            self.teams = netball.data.getTeams(self.games, year);
+            if (self.mode === "fullTeamView")
+                self.fullTeamView();
+            else if (self.mode === "singleTeamView")
+                self.singleTeamView(self.singleTeam);
         }
 
         function defaultTick(){

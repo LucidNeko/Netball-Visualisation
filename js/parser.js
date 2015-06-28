@@ -10,7 +10,7 @@
 					  "data/2013-Table1.csv" ];
 
 	var getYearFromFilename = function (filename) {
-		return filename.substring(5, 9);
+		return +filename.substring(5, 9);
 	}
 
 	//camelcode. Converts str into camelcase.

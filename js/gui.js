@@ -41,8 +41,8 @@
 	}
 
 	self.onYearChange = function (year) {
-		// console.log(year);
-		settings.year = year;
+        // if year is number string, convert to number
+		settings.year = year == "all" ? year : +year;
 		// d3.select("#vis-svg").selectAll("*").remove();
 		switch(settings.visualisation) {
 		case "rivals" :
@@ -59,7 +59,7 @@
 
 	self.onTeamSelectionChange = function (div) {
 		//div contains all the team selectables
-		
+
 	}
 
 	//calls onReady with the data once ready.
