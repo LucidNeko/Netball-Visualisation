@@ -302,6 +302,13 @@
                 return scaled;
             });
 
+            //change nodes ratio to be new value.
+            self.force.nodes().forEach(function (d, i) {
+                d.ratio = self.teams[i].ratio;
+                d.wins = self.teams[i].wins;
+                d.losses = self.teams[i].losses;
+            });
+
             self.svg.selectAll(".team-node-circle")
                 .transition()
                 .duration(800)
@@ -309,6 +316,7 @@
                 .attr("r", function (d){
                     return d.ratio * maxR;
                 });
+
 
             // remove possible old elements
             self.svg.selectAll(".force-line").remove();
