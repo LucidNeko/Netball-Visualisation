@@ -767,7 +767,7 @@
                 .attr("class", "help")
                 .attr("transform", "translate("
                       + (x - margin.left - margin.right + 100) + ", "
-                      + (y - margin.top - margin.bottom) + ")")
+                      + (y - margin.top - margin.bottom - 100) + ")")
                 .attr("title", text);
 
             help.append("image")

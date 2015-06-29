@@ -39,7 +39,7 @@
         }).reverse();
 
         var container = d3.select("#vis-container")
-        
+
         years.forEach(function (year) {
         	container.append("input")
         		.attr("onchange", "netball.gui.onYearChange(value)")
@@ -101,21 +101,21 @@
 	self.giveToolTip = function (selector) {
 		//jquery adapted from: http://stackoverflow.com/questions/6629294/tooltip-jquery
 
-        $(selector).mouseover(function(e) { 
+        $(selector).mouseover(function(e) {
 
-                tip = $(this).attr('title'); //tip is global 
+                tip = $(this).attr('title'); //tip is global
                 $(this).attr('title','');
                 $('.tooltip').fadeTo(300, 0.9).children('.tipBody').html( tip );
 
             }).mousemove(function(e) {
             	//track the mouse location
-                $('.tooltip').css('top', e.pageY + 10 ); 
+                $('.tooltip').css('top', e.pageY + 10 );
                 $('.tooltip').css('left', e.pageX + 20 );
 
             }).mouseout(function(e) {
                 $('.tooltip').hide();
                 $(this).attr( 'title', tip );
-            }); 
+            });
 	}
 
 	//calls onReady with the data once ready.
